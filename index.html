@@ -73,35 +73,48 @@
         <p class="text-sm font-bold uppercase text-brand-yellow tracking-widest mt-2">Securing Cloud Handshake...</p>
     </div>
 
-    <!-- LOGIN SCREEN (Initially Hidden) -->
-    <div id="login-screen" class="hidden w-full max-w-md bg-brand-card p-8 border-4 border-black shadow-flat-lg flex flex-col gap-6">
-        <div class="text-center">
-            <h1 class="text-3xl font-black text-brand-yellow tracking-tight uppercase">SQUARE_SECURE</h1>
-            <p class="text-xs font-bold text-zinc-400 mt-1 uppercase tracking-wider">Access Real-Time Database Workspace</p>
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="login-screen" class="hidden w-full max-w-md bg-brand-card border-4 border-black shadow-flat-lg overflow-hidden">
+        <!-- Tab Switches -->
+        <div class="flex border-b-4 border-black">
+            <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all">
+                Sign In
+            </button>
+            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                Create Workspace
+            </button>
         </div>
 
-        <form id="login-form" class="flex flex-col gap-4">
-            <div>
-                <label for="login-username" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Username</label>
-                <input type="text" id="login-username" placeholder="Enter username (e.g., karnataka_user)" required
-                       class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm uppercase">
+        <div class="p-8 flex flex-col gap-6">
+            <div class="text-center">
+                <h1 id="auth-title" class="text-2xl font-black text-white tracking-tight uppercase">SQUARE_SECURE</h1>
+                <p id="auth-subtitle" class="text-xs font-bold text-zinc-400 mt-1 uppercase tracking-wider">Access Your Real-Time Database</p>
             </div>
 
-            <div>
-                <label for="login-password" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Password</label>
-                <input type="password" id="login-password" placeholder="••••••••" required
-                       class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm">
-            </div>
+            <!-- LOGIN & SIGN UP FORM -->
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
+                <div>
+                    <label for="auth-username" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Username</label>
+                    <input type="text" id="auth-username" placeholder="Choose a username" required
+                           class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm uppercase">
+                </div>
 
-            <!-- Real-time database warning -->
-            <div id="db-status-badge" class="bg-black/40 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center">
-                Checking Cloud Status...
-            </div>
+                <div>
+                    <label for="auth-password" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required
+                           class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm">
+                </div>
 
-            <button type="submit" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
-                Unlock Workspace
-            </button>
-        </form>
+                <!-- Database mode visual status -->
+                <div id="db-status-badge" class="bg-black/60 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center transition-all">
+                    Scanning Storage Status...
+                </div>
+
+                <button type="submit" id="auth-btn" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
+                    Access Workspace
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- MAIN APP SCREEN (Initially hidden, shown after successful login) -->
@@ -113,7 +126,7 @@
                 <div>
                     <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
                     <p class="text-xs sm:text-sm font-bold uppercase mt-1 tracking-wider">
-                        Welcome, <span id="user-display" class="underline text-black font-black">User</span>! Active <span id="workspace-mode-label" class="bg-black text-white px-2 py-0.5 font-black text-[10px]">LOCAL</span> Workspace
+                        Welcome back, <span id="user-display" class="underline text-black font-black">User</span>! Workspace Mode: <span id="workspace-mode-label" class="bg-black text-white px-2 py-0.5 font-black text-[10px]">LOCAL</span>
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -365,7 +378,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                apiKey: "", // Blank in offline environments
+                apiKey: "", // Left blank for local/GitHub Pages setup initially
                 authDomain: "square-expense-realtime.firebaseapp.com",
                 projectId: "square-expense-realtime",
                 storageBucket: "square-expense-realtime.appspot.com",
@@ -373,8 +386,9 @@
                 appId: "1:1234:web:abcd"
             };
 
-        // Offline / Local Storage fallback state
+        // App state parameters
         let isLocalFallback = false;
+        let authMode = "login"; // "login" or "register"
         let expenses = [];
         let salary = 75000; // Default Salary
         let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
@@ -384,15 +398,15 @@
         const connectionTimeout = setTimeout(() => {
             if (!workspaceId) {
                 console.warn("Cloud connection handshake timed out. Activating Local Secure Mode.");
-                activateOfflineFallback("Cloud Connection Timeout (Local Mode Active)");
+                activateOfflineFallback();
             }
         }, 2500);
 
-        function activateOfflineFallback(reason) {
+        function activateOfflineFallback() {
             isLocalFallback = true;
             clearTimeout(connectionTimeout);
             
-            // Hide loading indicator, show login screen immediately so they are not stuck!
+            // Hide loading indicator, show auth screen immediately so they are not stuck!
             document.getElementById('loading-screen').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             
@@ -435,12 +449,36 @@
                 }
             } else {
                 // No API key provided, switch instantly to local offline mode
-                activateOfflineFallback("No Firebase API Key configured");
+                activateOfflineFallback();
             }
         } catch (e) {
             console.error("Firebase Handshake Exception: ", e);
-            activateOfflineFallback("Database Initialization Error");
+            activateOfflineFallback();
         }
+
+        // Tab switching controller
+        window.switchAuthTab = (mode) => {
+            authMode = mode;
+            const tabLogin = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-register');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const btn = document.getElementById('auth-btn');
+
+            if (mode === 'login') {
+                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all";
+                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white transition-all";
+                title.textContent = "SQUARE_SECURE";
+                subtitle.textContent = "Access Your Real-Time Database";
+                btn.textContent = "Unlock Real-time Workspace";
+            } else {
+                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white border-r-4 border-black transition-all";
+                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-green text-black transition-all";
+                title.textContent = "REGISTER_WORKSPACE";
+                subtitle.textContent = "Setup a brand new ledger profile";
+                btn.textContent = "Create Workspace Profile";
+            }
+        };
 
         const categoryColors = {
             'Food & Dining': { bg: 'bg-brand-yellow', border: 'border-brand-yellow', hex: '#FFE600' },
@@ -451,24 +489,7 @@
             'Miscellaneous': { bg: 'bg-brand-orange', border: 'border-brand-orange', hex: '#FF5C00' }
         };
 
-        // Helper to construct dates
-        function getOffsetDate(daysOffset) {
-            const date = new Date();
-            date.setDate(date.getDate() + daysOffset);
-            return date.toISOString().split('T')[0];
-        }
-
-        // Demo Data Template
-        const demoData = [
-            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
-            { title: "Monthly Fuel Refill", amount: 4500, category: "Transport & Auto", date: getOffsetDate(-2) },
-            { title: "Concert Access & Cinema Passes", amount: 3500, category: "Entertainment", date: getOffsetDate(-4) },
-            { title: "Home Broadband & Utility Bills", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
-            { title: "Tactile Keyboard Upgrade", amount: 9500, category: "Shopping & Custom", date: getOffsetDate(-8) },
-            { title: "Premium Roast Coffee Beans", amount: 1200, category: "Food & Dining", date: getOffsetDate(-10) }
-        ];
-
-        // Custom Hashing function to construct a deterministic ID string from username + password
+        // Custom Deterministic SHA-256 Hashing for authentication isolation
         async function getDeterministicHash(username, password) {
             const msgUint8 = new TextEncoder().encode(username.trim().toLowerCase() + "::" + password.trim());
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -476,41 +497,81 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
         }
 
-        // Form Submission to unlock the Workspace
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
+        // Authenticating / Registering Workspace Handler
+        window.handleAuthSubmit = async (e) => {
             e.preventDefault();
-            const usernameVal = document.getElementById('login-username').value;
-            const passwordVal = document.getElementById('login-password').value;
+            const usernameInput = document.getElementById('auth-username').value.trim();
+            const passwordInput = document.getElementById('auth-password').value.trim();
 
-            // Generate deterministic sub-workspace identifier using SHA-256
-            workspaceId = await getDeterministicHash(usernameVal, passwordVal);
+            if (!usernameInput || !passwordInput) return;
 
-            // Toggle screens
+            // Generate deterministic sub-workspace identifier using SHA-256 hash
+            workspaceId = await getDeterministicHash(usernameInput, passwordInput);
+
+            if (isLocalFallback) {
+                if (authMode === 'register') {
+                    // Check if workspace already exists locally
+                    const checkExist = localStorage.getItem(`expenses-${workspaceId}`);
+                    if (checkExist !== null) {
+                        showNotification("Workspace username combination already taken!", "pink");
+                        return;
+                    }
+                    // Setup workspace
+                    localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify([]));
+                    localStorage.setItem(`salary-${workspaceId}`, "75000");
+                    showNotification("Local Workspace successfully initialized!", "green");
+                } else {
+                    // Check if workspace exists
+                    const checkExist = localStorage.getItem(`expenses-${workspaceId}`);
+                    if (checkExist === null) {
+                        showNotification("Workspace mismatch! Switch to 'Create Workspace' to register.", "pink");
+                        return;
+                    }
+                }
+                proceedIntoApp(usernameInput);
+                startLocalListeners();
+            } else {
+                // Cloud Sync Actions
+                try {
+                    const workspaceCheckRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
+                    const workspaceCheck = await getDoc(workspaceCheckRef);
+
+                    if (authMode === 'register') {
+                        if (workspaceCheck.exists()) {
+                            showNotification("Workspace combination already taken!", "pink");
+                            return;
+                        }
+                        // Create workspace doc in Firestore
+                        await setDoc(workspaceCheckRef, { salary: 75000, initialized: true });
+                        showNotification("Cloud Workspace registered successfully!", "green");
+                    } else {
+                        if (!workspaceCheck.exists()) {
+                            showNotification("Workspace mismatch! Switch to 'Create Workspace' to register.", "pink");
+                            return;
+                        }
+                    }
+                    proceedIntoApp(usernameInput);
+                    startRealtimeListeners();
+                } catch (err) {
+                    console.error("Workspace configuration error: ", err);
+                    showNotification("Workspace verification failed. Try Local Offline Mode.", "pink");
+                }
+            }
+        };
+
+        function proceedIntoApp(username) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             document.body.classList.remove('justify-center', 'items-center');
-
-            document.getElementById('user-display').textContent = usernameVal.toUpperCase();
-
-            // Set current date selector
+            document.getElementById('user-display').textContent = username.toUpperCase();
             document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
+        }
 
-            if (isLocalFallback) {
-                startLocalListeners();
-                showNotification(`Offline session loaded locally: ${usernameVal.toUpperCase()}`, "yellow");
-            } else {
-                startRealtimeListeners();
-                showNotification(`Handshake verified. Secure cloud session loaded: ${usernameVal.toUpperCase()}`, "green");
-            }
-        });
-
-        // Local state initializer
+        // Local storage offline state synchronizers
         function startLocalListeners() {
-            // Retrieve local salary
             const cachedSalary = localStorage.getItem(`salary-${workspaceId}`);
             salary = cachedSalary ? parseFloat(cachedSalary) : 75000;
 
-            // Retrieve local expenses
             const cachedExpenses = localStorage.getItem(`expenses-${workspaceId}`);
             expenses = cachedExpenses ? JSON.parse(cachedExpenses) : [];
 
@@ -518,7 +579,7 @@
             renderExpenses();
         }
 
-        // Sync Firestore Listeners
+        // Sync Firestore Real-Time Cloud Listeners
         let unsubscribeSettings = null;
         let unsubscribeExpenses = null;
 
@@ -554,15 +615,15 @@
         }
 
         // Clean up connections on lock
-        window.handleLogout = () => {
+        document.getElementById('btn-logout').addEventListener('click', () => {
             showConfirm("Are you sure you want to lock and exit the current session?", () => {
                 if (unsubscribeSettings) unsubscribeSettings();
                 if (unsubscribeExpenses) unsubscribeExpenses();
 
                 workspaceId = "";
                 expenses = [];
-                document.getElementById('login-username').value = "";
-                document.getElementById('login-password').value = "";
+                document.getElementById('auth-username').value = "";
+                document.getElementById('auth-password').value = "";
 
                 document.getElementById('app-screen').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -570,7 +631,7 @@
 
                 showNotification("Session closed and locked.", "pink");
             });
-        };
+        });
 
         // Format Currency to Rupees (₹)
         function formatCurrency(value) {
@@ -583,21 +644,16 @@
 
         // Update Dashboard indicators
         function updateDashboard() {
-            // Computed expenses spent
             const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
             document.getElementById('total-amount').textContent = formatCurrency(totalSpent);
-
-            // Salary display update
             document.getElementById('salary-display').textContent = formatCurrency(salary);
 
-            // Compute Remain Amount
             const remainAmount = salary - totalSpent;
             const balanceEl = document.getElementById('remaining-balance');
             const balanceContainer = document.getElementById('balance-container');
 
             balanceEl.textContent = formatCurrency(remainAmount);
 
-            // Warning styling if overspent
             if (remainAmount < 0) {
                 balanceContainer.className = "bg-black p-4 border-2 border-brand-pink shadow-flat-sm";
                 balanceEl.className = "text-xl font-black text-brand-pink animate-pulse";
@@ -606,14 +662,10 @@
                 balanceEl.className = "text-xl font-black text-brand-blue";
             }
 
-            // Entries Count
             document.getElementById('stat-count').textContent = expenses.length;
-
-            // Calculated average
             const avg = expenses.length > 0 ? (totalSpent / expenses.length) : 0;
             document.getElementById('stat-average').textContent = formatCurrency(avg);
 
-            // Salary allocation utilization bar calculations
             const usagePercent = salary > 0 ? Math.min(100, Math.round((totalSpent / salary) * 100)) : 0;
             document.getElementById('budget-percent').textContent = `${usagePercent}% of Salary Spent`;
 
@@ -654,7 +706,6 @@
             };
 
             if (isLocalFallback) {
-                // Add local element
                 const payloadWithId = { id: 'local-' + Date.now(), ...expensePayload };
                 expenses.unshift(payloadWithId);
                 localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
@@ -672,7 +723,6 @@
                 }
             }
 
-            // Reset forms
             titleInput.value = '';
             amountInput.value = '';
             document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
