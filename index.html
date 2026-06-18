@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQUARE - Realtime Expense Tracker</title>
+    <title>SQUARE - Sleek Premium Expense Tracker</title>
     <!-- Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,357 +11,277 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            yellow: '#FFE600',
-                            green: '#39FF14',
-                            blue: '#00F0FF',
-                            purple: '#BD00FF',
-                            orange: '#FF5C00',
-                            pink: '#FF007A',
-                            dark: '#121212',
-                            card: '#FFFFFF' /* Clean White Aesthetic Cards */
-                        }
+                        darkBg: '#121214',
+                        darkCard: '#1C1C1E',
+                        darkAccent: '#2C2C2E',
+                        brandGreen: '#55EF9E',
+                        brandPink: '#FF7E82',
+                        brandBlue: '#3CC4EC',
+                        brandPurple: '#8E8FFA',
+                        brandYellow: '#FCD34D',
+                        brandOrange: '#FF9F43'
                     },
                     boxShadow: {
-                        'flat-sm': '3px 3px 0px 0px #000000',
-                        'flat-md': '6px 6px 0px 0px #000000',
-                        'flat-lg': '10px 10px 0px 0px #000000',
-                        'flat-yellow': '5px 5px 0px 0px #000000',
-                        'flat-blue': '5px 5px 0px 0px #00F0FF',
-                        'flat-green': '5px 5px 0px 0px #000000',
+                        'premium': '0 10px 30px -10px rgba(0,0,0,0.7)',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Modern neo-brutalist and sharp UI styling */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+        /* Sleek premium typography matching the design mock */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: #F3F4F6; /* Premium light gray/white aesthetic background */
-            color: #121212;
+            font-family: 'Inter', sans-serif;
+            background-color: #121214;
+            color: #FFFFFF;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Customize scrollbar to match clean white design */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* Custom scrollbar for horizontal month scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        ::-webkit-scrollbar-track {
-            background: #FFFFFF;
-            border: 2px solid #000000;
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
-        ::-webkit-scrollbar-thumb {
-            background: #FFE600;
-            border: 1px solid #000000;
-        }
-        
-        /* Disable default rounded corners on input elements in Safari/iOS */
-        input, select, button, textarea {
-            -webkit-appearance: none;
-            border-radius: 0px !important;
+
+        /* Ring segment transitions */
+        .chart-segment {
+            transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-8 justify-center items-center">
+<body class="min-h-screen flex flex-col justify-center items-center p-0 sm:p-4">
 
-    <!-- LOADING SCREEN -->
-    <div id="loading-screen" class="w-full max-w-md bg-white p-8 border-4 border-black shadow-flat-lg flex flex-col items-center gap-4 text-center">
-        <div class="animate-spin w-10 h-10 border-4 border-black border-t-brand-yellow"></div>
-        <p class="text-sm font-bold uppercase text-black tracking-widest mt-2">Securing Cloud Handshake...</p>
+    <!-- INITIAL HANDSHAKE LOADING -->
+    <div id="loading-screen" class="fixed inset-0 bg-darkBg z-50 flex flex-col items-center justify-center gap-4">
+        <div class="animate-spin w-12 h-12 border-4 border-brandGreen border-t-transparent rounded-full"></div>
+        <p class="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-2">Securing Cloud Handshake...</p>
     </div>
 
-    <!-- AUTHENTICATION CONTAINER -->
-    <div id="login-screen" class="hidden w-full max-w-md bg-white border-4 border-black shadow-flat-lg overflow-hidden">
-        <!-- Tab Switches -->
-        <div class="flex border-b-4 border-black">
-            <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all">
+    <!-- AUTHENTICATION LAYER -->
+    <div id="login-screen" class="hidden w-full max-w-md bg-darkCard p-8 rounded-3xl shadow-premium border border-zinc-800 flex flex-col gap-6 mx-4">
+        <div class="text-center">
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">SQUARE_SECURE</h1>
+            <p class="text-xs font-medium text-zinc-400 mt-1">Unlock Your Real-Time Balance Database</p>
+        </div>
+
+        <div class="flex bg-darkBg p-1 rounded-xl border border-zinc-800">
+            <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg bg-zinc-800 text-white transition-all">
                 Sign In
             </button>
-            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black transition-all">
-                Create Workspace
+            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg text-zinc-400 transition-all">
+                Register
             </button>
         </div>
 
-        <div class="p-8 flex flex-col gap-6">
-            <div class="text-center">
-                <h1 id="auth-title" class="text-2xl font-black text-black tracking-tight uppercase">SQUARE_SECURE</h1>
-                <p id="auth-subtitle" class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wider">Access Your Real-Time Database</p>
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
+            <div>
+                <label for="auth-username" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Username</label>
+                <input type="text" id="auth-username" placeholder="Type username" required
+                       class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-600">
             </div>
 
-            <!-- LOGIN & SIGN UP FORM -->
-            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
+            <div>
+                <label for="auth-password" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Password</label>
+                <input type="password" id="auth-password" placeholder="••••••••" required
+                       class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-600">
+            </div>
+
+            <div id="db-status-badge" class="bg-zinc-900/50 p-3 rounded-xl border border-zinc-800 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center transition-all">
+                Scanning Cloud Connection...
+            </div>
+
+            <button type="submit" id="auth-btn" class="w-full bg-brandGreen hover:bg-emerald-400 text-darkBg font-extrabold py-4 rounded-xl transition-all shadow-lg shadow-brandGreen/20 text-sm uppercase tracking-wider mt-2">
+                Access Workspace
+            </button>
+        </form>
+    </div>
+
+    <!-- MAIN MOBILE CONTAINER APP FRAME -->
+    <div id="app-screen" class="hidden w-full max-w-md bg-darkBg sm:rounded-[40px] shadow-premium sm:border-[8px] border-zinc-800 flex flex-col overflow-hidden min-h-screen sm:min-h-[850px] relative">
+        
+        <!-- TOP APP HEADER -->
+        <header class="p-6 pb-2 flex justify-between items-center bg-darkBg">
+            <div>
+                <p class="text-xs text-zinc-400 font-medium">Hello,</p>
+                <h2 id="user-display" class="text-lg font-bold text-white">John Doe</h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="workspace-mode-label" class="bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-full font-bold text-[10px] tracking-wide uppercase">LOCAL</span>
+                <button onclick="handleLogout()" class="p-2 bg-zinc-800/60 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400 hover:text-white" title="Lock workspace">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12.22 2h-.44a2 2 0 00-2 2v2h4.44V4a2 2 0 00-2-2zM6.5 10.5V8a5.5 5.5 0 0111 0v2.5M4 11h16a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2v-7a2 2 0 012-2z" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- HORIZONTAL MONTH TABS (January to December Filter) -->
+        <div class="px-6 py-2 overflow-x-auto flex gap-4 no-scrollbar border-b border-zinc-900 bg-darkBg">
+            <button onclick="filterByMonth(0)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">January</button>
+            <button onclick="filterByMonth(1)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">February</button>
+            <button onclick="filterByMonth(2)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">March</button>
+            <button onclick="filterByMonth(3)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">April</button>
+            <button onclick="filterByMonth(4)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">May</button>
+            <button onclick="filterByMonth(5)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">June</button>
+            <button onclick="filterByMonth(6)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">July</button>
+            <button onclick="filterByMonth(7)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">August</button>
+            <button onclick="filterByMonth(8)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">September</button>
+            <button onclick="filterByMonth(9)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">October</button>
+            <button onclick="filterByMonth(10)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">November</button>
+            <button onclick="filterByMonth(11)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">December</button>
+        </div>
+
+        <!-- CORE STATS BALANCE VIEW -->
+        <div class="px-6 pt-5 grid grid-cols-2 gap-4">
+            <!-- Total Balance (Salary) -->
+            <div class="bg-darkCard p-4 rounded-2xl border border-zinc-800 relative group overflow-hidden">
+                <span class="text-[11px] font-semibold text-zinc-400 block mb-1 uppercase tracking-wide">Total Balance</span>
+                <span id="salary-display" class="text-xl font-bold text-white block">₹0</span>
+                <button onclick="openSalaryModal()" class="absolute right-3 bottom-3 p-1.5 bg-zinc-800 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+            </div>
+            
+            <!-- Total Expense -->
+            <div class="bg-darkCard p-4 rounded-2xl border border-zinc-800">
+                <span class="text-[11px] font-semibold text-zinc-400 block mb-1 uppercase tracking-wide">Total Expense</span>
+                <span id="total-expense-display" class="text-xl font-bold text-white block">₹0</span>
+            </div>
+        </div>
+
+        <!-- CIRCULAR DOUGHNUT CHART CARD -->
+        <div class="mx-6 mt-5 bg-darkCard p-6 rounded-3xl border border-zinc-800 flex flex-col items-center justify-center min-h-[260px]">
+            <div class="relative w-44 h-44 flex items-center justify-center">
+                <!-- SVG Container for the custom dynamic arcs -->
+                <svg id="doughnut-chart-svg" class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                    <!-- Standard placeholder base ring circle -->
+                    <circle cx="60" cy="60" r="46" fill="none" stroke="#2C2C2E" stroke-width="12" />
+                </svg>
+
+                <!-- Center metrics block -->
+                <div class="absolute flex flex-col items-center justify-center text-center">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Expense</span>
+                    <span id="center-total-display" class="text-xl font-extrabold text-white">₹0</span>
+                </div>
+            </div>
+
+            <!-- Distribution percentages status indicator -->
+            <div id="chart-legend-list" class="grid grid-cols-3 gap-y-2.5 gap-x-1.5 w-full mt-6 border-t border-zinc-800/60 pt-4 text-[11px] font-bold tracking-wide uppercase text-zinc-400">
+                <!-- Dynamic categories inject dynamically here -->
+            </div>
+        </div>
+
+        <!-- HISTORY LEDGERS SECTION -->
+        <div class="px-6 pt-5 pb-24 flex-grow flex flex-col">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-extrabold uppercase tracking-widest text-zinc-400">Recent Ledgers</h3>
+                <span id="filtered-count" class="text-[11px] font-semibold text-zinc-500 uppercase">0 Entries</span>
+            </div>
+
+            <div class="flex-grow min-h-[150px] overflow-y-auto space-y-3 pr-0.5" id="ledger-list">
+                <!-- Ledger Cards will populate dynamically -->
+                <div class="text-center py-8 text-zinc-500 text-xs font-semibold uppercase tracking-wider">No logs listed.</div>
+            </div>
+        </div>
+
+        <!-- FLOATING ADD BUTTON & CONTROL NAVIGATION PANEL -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center bg-darkCard/95 backdrop-blur-md py-3 px-6 rounded-2xl border border-zinc-800 gap-6 shadow-2xl z-20">
+            <button onclick="downloadCSV()" class="p-2 text-zinc-400 hover:text-white transition-colors" title="Export CSV file">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            </button>
+            
+            <button onclick="openAddExpenseSheet()" class="w-12 h-12 rounded-full bg-brandGreen text-darkBg hover:scale-105 active:scale-95 transition-all flex items-center justify-center shadow-lg shadow-brandGreen/25" title="Add entry">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+            </button>
+
+            <button onclick="clearAllExpenses()" class="p-2 text-zinc-400 hover:text-brandPink transition-colors" title="Clear Workspace">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- SLIDE-IN BOTTOM MODAL SHEET: ADD TRANSACTION -->
+    <div id="add-expense-sheet" class="fixed inset-0 bg-black/80 flex items-end justify-center z-40 hidden transition-opacity duration-300">
+        <div class="w-full max-w-md bg-darkCard rounded-t-[32px] p-6 border-t border-zinc-800 flex flex-col gap-5 transform translate-y-full transition-transform duration-300">
+            <!-- Header bar -->
+            <div class="flex justify-between items-center pb-2 border-b border-zinc-800/60">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">New Transaction</h3>
+                <button onclick="closeAddExpenseSheet()" class="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="expense-form" onsubmit="handleExpenseSubmit(event)" class="flex flex-col gap-4">
                 <div>
-                    <label for="auth-username" class="block text-xs font-bold uppercase mb-2 text-gray-700">Username</label>
-                    <input type="text" id="auth-username" placeholder="Choose a username" required
-                           class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none text-sm uppercase">
+                    <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Description</label>
+                    <input type="text" id="item-title" placeholder="e.g. Uber Cab Charge" required
+                           class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-700">
                 </div>
 
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Amount (₹)</label>
+                        <input type="number" id="item-amount" min="1" step="1" placeholder="₹0" required
+                               class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-700">
+                    </div>
+                    <div>
+                        <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Date</label>
+                        <input type="date" id="item-date" required
+                               class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-xs placeholder-zinc-700">
+                    </div>
+                </div>
+
+                <!-- SELECT CATEGORY PILLS PANEL (Mirrors right design layout) -->
                 <div>
-                    <label for="auth-password" class="block text-xs font-bold uppercase mb-2 text-gray-700">Password</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" required
-                           class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none text-sm">
+                    <span class="block text-xs font-bold uppercase mb-2.5 text-zinc-400">Select Category</span>
+                    <input type="hidden" id="item-category" value="Food & Dining">
+                    <div id="category-pills-container" class="flex flex-wrap gap-2">
+                        <button type="button" onclick="selectCategoryPill('Food & Dining')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Food</button>
+                        <button type="button" onclick="selectCategoryPill('Transport & Auto')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Transport</button>
+                        <button type="button" onclick="selectCategoryPill('Entertainment')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Entertainment</button>
+                        <button type="button" onclick="selectCategoryPill('Utilities & Bills')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Utilities</button>
+                        <button type="button" onclick="selectCategoryPill('Shopping & Custom')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Shopping</button>
+                        <button type="button" onclick="selectCategoryPill('Miscellaneous')" class="cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400 transition-colors uppercase border border-transparent">Misc</button>
+                    </div>
                 </div>
 
-                <!-- Database mode visual status -->
-                <div id="db-status-badge" class="bg-gray-100 p-3 border border-black text-[11px] font-bold uppercase text-gray-600 tracking-wider text-center transition-all">
-                    Scanning Storage Status...
-                </div>
-
-                <button type="submit" id="auth-btn" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
-                    Access Workspace
+                <button type="submit" class="w-full bg-brandGreen hover:bg-emerald-400 text-darkBg font-extrabold py-3.5 rounded-xl transition-all shadow-lg shadow-brandGreen/20 text-sm uppercase tracking-wider mt-2">
+                    Add Expense
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN APP SCREEN (Initially hidden, shown after successful login) -->
-    <div id="app-screen" class="hidden w-full max-w-6xl mx-auto flex flex-col gap-6">
-        
-        <!-- Header Section -->
-        <header class="w-full">
-            <div class="bg-white text-black p-6 border-4 border-black shadow-flat-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
-                    <p class="text-xs sm:text-sm font-bold uppercase mt-1 tracking-wider">
-                        Welcome back, <span id="user-display" class="underline text-black font-black">User</span>! Workspace Mode: <span id="workspace-mode-label" class="bg-black text-white px-2 py-0.5 font-black text-[10px]">LOCAL</span>
-                    </p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button id="btn-demo" class="bg-white hover:bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
-                        Populate Sample Data
-                    </button>
-                    <button id="btn-clear" class="bg-brand-pink hover:bg-pink-600 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
-                        Clear All Data
-                    </button>
-                    <button id="btn-logout" class="bg-white hover:bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
-                        Lock Workspace
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content Grid -->
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow w-full">
-            
-            <!-- Left Column: Add Expense Form & Stats (5 Cols on Large) -->
-            <section class="lg:col-span-5 flex flex-col gap-6">
-                
-                <!-- Quick Stats Board -->
-                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black">Overview Dashboard</h2>
-                    
-                    <!-- Salary Details Widget -->
-                    <div class="bg-white p-4 border-2 border-black shadow-flat-sm flex justify-between items-center">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Total Monthly Salary</span>
-                            <span id="salary-display" class="text-2xl font-black text-black">₹0</span>
-                        </div>
-                        <button id="btn-update-salary" class="bg-brand-yellow text-black text-xs font-extrabold py-1.5 px-3 border border-black hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm uppercase tracking-wider">
-                            Update
-                        </button>
-                    </div>
-
-                    <!-- Side-by-side: Expenses vs Money Left -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Total Expenses Box -->
-                        <div class="bg-white p-4 border-2 border-black shadow-flat-sm">
-                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-1">Spent Money</span>
-                            <span id="total-amount" class="text-xl font-black text-brand-pink">₹0</span>
-                        </div>
-
-                        <!-- Remaining Balance Box -->
-                        <div id="balance-container" class="bg-white p-4 border-2 border-black shadow-flat-sm">
-                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-1">Remain Amount</span>
-                            <span id="remaining-balance" class="text-xl font-black text-black">₹0</span>
-                        </div>
-                    </div>
-
-                    <!-- Budget / Salary Usage Box -->
-                    <div class="bg-white p-4 border-2 border-black flex flex-col gap-2">
-                        <div class="flex justify-between items-baseline">
-                            <span class="text-xs font-bold uppercase text-gray-500">Salary Utilized</span>
-                            <span id="budget-percent" class="text-xs font-black text-gray-700">0% Used</span>
-                        </div>
-                        <!-- Square Progress Bar -->
-                        <div class="w-full bg-gray-100 h-6 border-2 border-black p-0.5">
-                            <div id="budget-progress-bar" class="h-full bg-brand-yellow transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Secondary KPI Squares -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-gray-50 p-3 border-2 border-black">
-                            <span class="text-[10px] font-bold uppercase text-gray-500 block">Total Entries</span>
-                            <span id="stat-count" class="text-xl font-bold text-black">0</span>
-                        </div>
-                        <div class="bg-gray-50 p-3 border-2 border-black">
-                            <span class="text-[10px] font-bold uppercase text-gray-500 block">Avg. Expense</span>
-                            <span id="stat-average" class="text-xl font-bold text-black">₹0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add Expense Square Card -->
-                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black">New Transaction</h2>
-                    
-                    <form id="expense-form" class="flex flex-col gap-4">
-                        <!-- Item Title -->
-                        <div>
-                            <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-gray-700">Expense Title / Description</label>
-                            <input type="text" id="item-title" placeholder="e.g., Grocery shopping, Gas, Chai & Snacks" required
-                                   class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
-                        </div>
-
-                        <!-- Row with Amount and Category -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Amount -->
-                            <div>
-                                <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-gray-700">Amount (₹)</label>
-                                <input type="number" id="item-amount" min="1" step="1" placeholder="0" required
-                                       class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm">
-                            </div>
-
-                            <!-- Category Selection -->
-                            <div>
-                                <label for="item-category" class="block text-xs font-bold uppercase mb-2 text-gray-700">Category</label>
-                                <select id="item-category" required
-                                        class="w-full bg-white text-black font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
-                                    <option value="Food & Dining">Food & Dining</option>
-                                    <option value="Transport & Auto">Transport</option>
-                                    <option value="Entertainment">Entertainment</option>
-                                    <option value="Utilities & Bills">Utilities</option>
-                                    <option value="Shopping & Custom">Shopping</option>
-                                    <option value="Miscellaneous">Misc</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Date Selection -->
-                        <div>
-                            <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-gray-700">Transaction Date</label>
-                            <input type="date" id="item-date" required
-                                   class="w-full bg-white text-black font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
-                            Add Expense Entry
-                        </button>
-                    </form>
-                </div>
-
-            </section>
-
-            <!-- Right Column: Ledger & Category Distribution (7 Cols on Large) -->
-            <section class="lg:col-span-7 flex flex-col gap-6">
-                
-                <!-- Category Distribution Visualizer -->
-                <div class="bg-white p-6 border-4 border-black shadow-flat-md">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black mb-4">Category Allocations</h2>
-                    
-                    <!-- Square visual bar stack -->
-                    <div id="category-distribution-container" class="flex flex-col gap-3">
-                        <!-- Dynamic blocks will render here -->
-                        <div class="text-gray-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>
-                    </div>
-                </div>
-
-                <!-- Ledger/History Box -->
-                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex-grow flex flex-col">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-black pb-4 mb-4">
-                        <h2 class="text-lg font-bold uppercase text-black">Ledger Entries</h2>
-                        
-                        <!-- Sorting & Search Control Grid -->
-                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                            <select id="filter-category"
-                                    class="bg-white text-black text-xs font-bold p-2 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase w-full sm:w-auto">
-                                <option value="ALL">All Categories</option>
-                                <option value="Food & Dining">Food & Dining</option>
-                                <option value="Transport & Auto">Transport</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Utilities & Bills">Utilities</option>
-                                <option value="Shopping & Custom">Shopping</option>
-                                <option value="Miscellaneous">Misc</option>
-                            </select>
-
-                            <select id="sort-order"
-                                    class="bg-white text-black text-xs font-bold p-2 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase w-full sm:w-auto">
-                                <option value="date-desc">Newest First</option>
-                                <option value="date-asc">Oldest First</option>
-                                <option value="amount-desc">Highest Amount</option>
-                                <option value="amount-asc">Lowest Amount</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Ledger Search Bar -->
-                    <div class="mb-4">
-                        <input type="text" id="search-ledger" placeholder="Filter ledger by title/keyword..." 
-                               class="w-full bg-white text-black placeholder-gray-400 text-xs font-bold p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase">
-                    </div>
-
-                    <!-- Table/List Area -->
-                    <div class="flex-grow overflow-y-auto max-h-[400px] border-2 border-black bg-white">
-                        <div id="ledger-list" class="divide-y-2 divide-black">
-                            <!-- Dynamic expense items will render here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Bottom Status -->
-                    <div class="mt-4 flex justify-between items-center text-xs font-bold uppercase text-gray-500">
-                        <span id="filtered-count">Showing 0 / 0 entries</span>
-                        <button id="btn-export" class="text-black underline text-xs uppercase font-extrabold">Export as CSV File</button>
-                    </div>
-                </div>
-
-            </section>
-
-        </main>
-
-        <!-- Footer Area -->
-        <footer class="w-full mt-8 border-t-4 border-black pt-4 text-center text-xs font-bold uppercase text-gray-500 tracking-widest flex flex-col sm:flex-row justify-between gap-2">
-            <span>SQUARE_EXPENSE © 2026</span>
-            <span>Premium Structural Real-Time Dashboard</span>
-        </footer>
-    </div>
-
-    <!-- Interactive Alert / Toast Notification box -->
-    <div id="toast-notification" class="fixed bottom-4 right-4 bg-white text-black p-4 border-4 border-black shadow-flat-sm hidden z-50 transition-all duration-300">
-        <div class="flex items-center gap-3">
-            <div id="toast-indicator" class="w-4 h-4 bg-brand-green border border-black"></div>
-            <p id="toast-text" class="text-xs font-extrabold uppercase tracking-wider text-black"></p>
-        </div>
-    </div>
-
-    <!-- Modal for editing/updating monthly salary -->
-    <div id="salary-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
-            <h3 class="text-xl font-bold uppercase text-black border-b-2 border-black pb-2 mb-4">Set Monthly Salary</h3>
+    <!-- UPDATE SALARY MODAL -->
+    <div id="salary-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-darkCard p-6 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-premium">
+            <h3 class="text-base font-bold uppercase text-white border-b border-zinc-800/60 pb-3 mb-4">Set Monthly Income</h3>
             <div class="flex flex-col gap-4">
                 <div>
-                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-gray-500 mb-2">Income Target (₹)</label>
-                    <input type="number" id="new-salary-input" min="1" placeholder="50000" class="w-full bg-white text-black p-3 border-2 border-black focus:outline-none text-sm">
+                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-zinc-400 mb-2">Total Salary (₹)</label>
+                    <input type="number" id="new-salary-input" min="1" placeholder="₹50000" class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:outline-none text-sm placeholder-zinc-700">
                 </div>
                 <div class="flex justify-end gap-2 mt-2">
-                    <button id="btn-close-salary-modal" class="bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black text-xs uppercase">Cancel</button>
-                    <button id="btn-save-salary" class="bg-brand-yellow text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Save income</button>
+                    <button onclick="closeSalaryModal()" class="bg-zinc-800 text-zinc-400 hover:text-white font-semibold py-2.5 px-4 rounded-xl text-xs uppercase">Cancel</button>
+                    <button onclick="saveSalary()" class="bg-brandGreen text-darkBg font-bold py-2.5 px-4 rounded-xl text-xs uppercase">Save Income</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Custom Dialog Box for confirmation prompts -->
-    <div id="confirm-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
-            <h3 class="text-xl font-bold uppercase text-brand-pink border-b-2 border-black pb-2 mb-2">Attention Required</h3>
-            <p id="confirm-message" class="text-sm text-gray-700 uppercase font-medium mb-6"></p>
+    <!-- CUSTOM CONFIRM DIALOG MODAL -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-darkCard p-6 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-premium">
+            <h3 class="text-base font-bold uppercase text-brandPink border-b border-zinc-800/60 pb-3 mb-2">Attention</h3>
+            <p id="confirm-message" class="text-xs text-zinc-400 uppercase font-medium mb-6 leading-relaxed"></p>
             <div class="flex justify-end gap-2">
-                <button id="confirm-cancel" class="bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black text-xs uppercase">No, Cancel</button>
-                <button id="confirm-ok" class="bg-brand-pink text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Yes, Proceed</button>
+                <button id="confirm-cancel" class="bg-zinc-800 text-zinc-400 hover:text-white font-semibold py-2.5 px-4 rounded-xl text-xs uppercase">Cancel</button>
+                <button id="confirm-ok" class="bg-brandPink text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase">Proceed</button>
             </div>
         </div>
     </div>
@@ -373,12 +293,12 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables provided by environment (or local fallbacks)
+        // Environment variables
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'square-expense-realtime';
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                apiKey: "", // Left blank for local fallback until customized
+                apiKey: "", // Left blank for local fallback
                 authDomain: "square-expense-realtime.firebaseapp.com",
                 projectId: "square-expense-realtime",
                 storageBucket: "square-expense-realtime.appspot.com",
@@ -386,18 +306,39 @@
                 appId: "1:1234:web:abcd"
             };
 
-        // App state parameters
+        // App State parameters
         let isLocalFallback = false;
         let authMode = "login"; // "login" or "register"
         let expenses = [];
         let salary = 75000; // Default Salary
         let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
         let user = null; // Firebase user
-        
-        // Define connection timeout fallback (If database doesn't respond in 2.5 seconds, skip directly to offline mode!)
+        let selectedMonth = new Date().getMonth(); // Active month selector filter (0-11)
+
+        // Configuration mapping colors to category indices
+        const categoryColors = {
+            'Food & Dining': { text: 'text-brandGreen', fill: '#55EF9E', bg: 'bg-brandGreen/10', border: 'border-brandGreen' },
+            'Transport & Auto': { text: 'text-brandBlue', fill: '#3CC4EC', bg: 'bg-brandBlue/10', border: 'border-brandBlue' },
+            'Entertainment': { text: 'text-brandPurple', fill: '#8E8FFA', bg: 'bg-brandPurple/10', border: 'border-brandPurple' },
+            'Utilities & Bills': { text: 'text-brandYellow', fill: '#FCD34D', bg: 'bg-brandYellow/10', border: 'border-brandYellow' },
+            'Shopping & Custom': { text: 'text-brandPink', fill: '#FF7E82', bg: 'bg-brandPink/10', border: 'border-brandPink' },
+            'Miscellaneous': { text: 'text-brandOrange', fill: '#FF9F43', bg: 'bg-brandOrange/10', border: 'border-brandOrange' }
+        };
+
+        // Standard Demo Logs setup matching the visuals
+        const demoData = [
+            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
+            { title: "Uber Cab Charge", amount: 450, category: "Transport & Auto", date: getOffsetDate(-2) },
+            { title: "Premium Cinema Ticket", amount: 1200, category: "Entertainment", date: getOffsetDate(-3) },
+            { title: "High-Speed WiFi Bill", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
+            { title: "Mechanical Keyboard", amount: 8500, category: "Shopping & Custom", date: getOffsetDate(-8) },
+            { title: "Local Snacks & Chai", amount: 350, category: "Food & Dining", date: getOffsetDate(-10) }
+        ];
+
+        // Connection Timeout Trigger
         const connectionTimeout = setTimeout(() => {
             if (!workspaceId) {
-                console.warn("Cloud connection timed out. Activating Local Secure Mode.");
+                console.warn("Cloud connection timed out. Activating Local Offline Mode.");
                 activateOfflineFallback();
             }
         }, 2500);
@@ -405,20 +346,18 @@
         function activateOfflineFallback() {
             isLocalFallback = true;
             clearTimeout(connectionTimeout);
-            
-            // Hide loading indicator, show auth screen immediately
             document.getElementById('loading-screen').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             
             const badge = document.getElementById('db-status-badge');
-            badge.textContent = "Offline Secure Mode Active (Local Storage Enabled)";
-            badge.className = "bg-yellow-50 p-3 border-2 border-black text-[11px] font-bold uppercase text-black tracking-wider text-center";
+            badge.textContent = "Offline Secure Mode Active (Local Storage)";
+            badge.className = "bg-zinc-800 p-3 rounded-xl border border-zinc-700 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center";
             
             document.getElementById('workspace-mode-label').textContent = "LOCAL OFFLINE";
-            document.getElementById('workspace-mode-label').className = "bg-brand-orange text-white px-2 py-0.5 font-black text-[10px]";
+            document.getElementById('workspace-mode-label').className = "bg-brandOrange/20 text-brandOrange px-3 py-1 rounded-full font-bold text-[10px] uppercase";
         }
 
-        // Initialize Firebase safely
+        // Initialize Firebase securely with fallback support
         let app, auth, db;
         try {
             if (firebaseConfig.apiKey) {
@@ -426,7 +365,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // Establish connection listener
                 onAuthStateChanged(auth, (firebaseUser) => {
                     user = firebaseUser;
                     clearTimeout(connectionTimeout);
@@ -434,62 +372,45 @@
                     if (user) {
                         document.getElementById('login-screen').classList.remove('hidden');
                         const badge = document.getElementById('db-status-badge');
-                        badge.textContent = "Cloud Handshake Verified. Real-time Synced Database Active.";
-                        badge.className = "bg-green-50 p-3 border-2 border-black text-[11px] font-bold uppercase text-black tracking-wider text-center";
+                        badge.textContent = "Cloud Connection Verified. Ready to sync.";
+                        badge.className = "bg-brandGreen/10 p-3 rounded-xl border border-brandGreen/20 text-[11px] font-bold uppercase text-brandGreen tracking-wider text-center";
                         document.getElementById('workspace-mode-label').textContent = "SECURE CLOUD";
-                        document.getElementById('workspace-mode-label').className = "bg-brand-green text-black px-2 py-0.5 font-black text-[10px]";
+                        document.getElementById('workspace-mode-label').className = "bg-brandGreen/20 text-brandGreen px-3 py-1 rounded-full font-bold text-[10px] uppercase";
                     }
                 });
 
-                // Init session Handshake
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
             } else {
-                // No API key provided, switch instantly to local offline mode
                 activateOfflineFallback();
             }
         } catch (e) {
-            console.error("Firebase Handshake Exception: ", e);
+            console.error("Firebase Initialization Exception: ", e);
             activateOfflineFallback();
         }
 
-        // Tab switching controller
+        // Tab switching logic for sign-in/registration
         window.switchAuthTab = (mode) => {
             authMode = mode;
             const tabLogin = document.getElementById('tab-login');
             const tabReg = document.getElementById('tab-register');
-            const title = document.getElementById('auth-title');
-            const subtitle = document.getElementById('auth-subtitle');
             const btn = document.getElementById('auth-btn');
 
             if (mode === 'login') {
-                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all";
-                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black transition-all";
-                title.textContent = "SQUARE_SECURE";
-                subtitle.textContent = "Access Your Real-Time Database";
-                btn.textContent = "Unlock Real-time Workspace";
+                tabLogin.className = "flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg bg-zinc-800 text-white transition-all";
+                tabReg.className = "flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg text-zinc-400 transition-all";
+                btn.textContent = "Access Workspace";
             } else {
-                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black border-r-4 border-black transition-all";
-                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black transition-all";
-                title.textContent = "REGISTER_WORKSPACE";
-                subtitle.textContent = "Setup a brand new ledger profile";
-                btn.textContent = "Create Workspace Profile";
+                tabLogin.className = "flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg text-zinc-400 transition-all";
+                tabReg.className = "flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wider rounded-lg bg-zinc-800 text-white transition-all";
+                btn.textContent = "Create Profile";
             }
         };
 
-        const categoryColors = {
-            'Food & Dining': { bg: 'bg-brand-yellow', border: 'border-brand-yellow', hex: '#FFE600' },
-            'Transport & Auto': { bg: 'bg-brand-blue', border: 'border-brand-blue', hex: '#00F0FF' },
-            'Entertainment': { bg: 'bg-brand-pink', border: 'border-brand-pink', hex: '#FF007A' },
-            'Utilities & Bills': { bg: 'bg-brand-green', border: 'border-brand-green', hex: '#39FF14' },
-            'Shopping & Custom': { bg: 'bg-brand-purple', border: 'border-brand-purple', hex: '#BD00FF' },
-            'Miscellaneous': { bg: 'bg-brand-orange', border: 'border-brand-orange', hex: '#FF5C00' }
-        };
-
-        // Custom Deterministic SHA-256 Hashing for authentication isolation
+        // Deterministic SHA-256 Workspace key generator
         async function getDeterministicHash(username, password) {
             const msgUint8 = new TextEncoder().encode(username.trim().toLowerCase() + "::" + password.trim());
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -497,7 +418,7 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
         }
 
-        // Authenticating / Registering Workspace Handler
+        // Auth Submissions
         window.handleAuthSubmit = async (e) => {
             e.preventDefault();
             const usernameInput = document.getElementById('auth-username').value.trim();
@@ -505,26 +426,22 @@
 
             if (!usernameInput || !passwordInput) return;
 
-            // Generate deterministic sub-workspace identifier using SHA-256 hash
             workspaceId = await getDeterministicHash(usernameInput, passwordInput);
 
             if (isLocalFallback) {
                 if (authMode === 'register') {
-                    // Check if workspace already exists locally
                     const checkExist = localStorage.getItem(`expenses-${workspaceId}`);
                     if (checkExist !== null) {
-                        showNotification("Workspace username combination already taken!", "pink");
+                        showNotification("Workspace combination already taken!", "pink");
                         return;
                     }
-                    // Setup workspace
                     localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify([]));
                     localStorage.setItem(`salary-${workspaceId}`, "75000");
-                    showNotification("Local Workspace successfully initialized!", "green");
+                    showNotification("Workspace Profile created locally!", "green");
                 } else {
-                    // Check if workspace exists
                     const checkExist = localStorage.getItem(`expenses-${workspaceId}`);
                     if (checkExist === null) {
-                        showNotification("Workspace mismatch! Switch to 'Create Workspace' to register.", "pink");
+                        showNotification("Combination mismatch! Click 'Register' tab to setup.", "pink");
                         return;
                     }
                 }
@@ -538,23 +455,25 @@
 
                     if (authMode === 'register') {
                         if (workspaceCheck.exists()) {
-                            showNotification("Workspace combination already taken!", "pink");
+                            showNotification("Workspace profile already exists!", "pink");
                             return;
                         }
-                        // Create workspace doc in Firestore
                         await setDoc(workspaceCheckRef, { salary: 75000, initialized: true });
-                        showNotification("Cloud Workspace registered successfully!", "green");
+                        showNotification("Workspace profile registered in cloud!", "green");
                     } else {
                         if (!workspaceCheck.exists()) {
-                            showNotification("Workspace mismatch! Switch to 'Create Workspace' to register.", "pink");
+                            showNotification("Combination mismatch! Click 'Register' tab to setup.", "pink");
                             return;
                         }
                     }
                     proceedIntoApp(usernameInput);
                     startRealtimeListeners();
                 } catch (err) {
-                    console.error("Workspace configuration error: ", err);
-                    showNotification("Workspace verification failed. Try Local Offline Mode.", "pink");
+                    console.error("Workspace config error: ", err);
+                    showNotification("Verification failed. Proceeding with Local Backup.", "pink");
+                    isLocalFallback = true;
+                    proceedIntoApp(usernameInput);
+                    startLocalListeners();
                 }
             }
         };
@@ -564,10 +483,16 @@
             document.getElementById('app-screen').classList.remove('hidden');
             document.body.classList.remove('justify-center', 'items-center');
             document.getElementById('user-display').textContent = username.toUpperCase();
+            
+            // Set default date input value to today
             document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
+            
+            // Set active highlighted month tab
+            filterByMonth(new Date().getMonth());
+            selectCategoryPill('Food & Dining');
         }
 
-        // Local storage offline state synchronizers
+        // Local Storage Mode listeners
         function startLocalListeners() {
             const cachedSalary = localStorage.getItem(`salary-${workspaceId}`);
             salary = cachedSalary ? parseFloat(cachedSalary) : 75000;
@@ -576,10 +501,9 @@
             expenses = cachedExpenses ? JSON.parse(cachedExpenses) : [];
 
             updateDashboard();
-            renderExpenses();
         }
 
-        // Sync Firestore Real-Time Cloud Listeners
+        // Cloud Real-Time snapshot sync
         let unsubscribeSettings = null;
         let unsubscribeExpenses = null;
 
@@ -589,7 +513,6 @@
             const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
             const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
 
-            // 1. Sync User settings
             unsubscribeSettings = onSnapshot(settingsDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     salary = docSnap.data().salary || 75000;
@@ -598,24 +521,28 @@
                 }
                 updateDashboard();
             }, (error) => {
-                console.error("Firestore read error: ", error);
+                console.error("Firestore settings sync error: ", error);
             });
 
-            // 2. Sync Expense Entries collection list
             unsubscribeExpenses = onSnapshot(expensesColRef, (colSnap) => {
                 expenses = [];
                 colSnap.forEach((doc) => {
                     expenses.push({ id: doc.id, ...doc.data() });
                 });
                 updateDashboard();
-                renderExpenses();
             }, (error) => {
-                console.error("Firestore sync ledger error: ", error);
+                console.error("Firestore expense list read error: ", error);
             });
         }
 
+        function getOffsetDate(daysOffset) {
+            const date = new Date();
+            date.setDate(date.getDate() + daysOffset);
+            return date.toISOString().split('T')[0];
+        }
+
         // Clean up connections on lock
-        document.getElementById('btn-logout').addEventListener('click', () => {
+        window.handleLogout = () => {
             showConfirm("Are you sure you want to lock and exit the current session?", () => {
                 if (unsubscribeSettings) unsubscribeSettings();
                 if (unsubscribeExpenses) unsubscribeExpenses();
@@ -631,9 +558,9 @@
 
                 showNotification("Session closed and locked.", "pink");
             });
-        });
+        };
 
-        // Format Currency to Rupees (₹)
+        // Formats raw currency values securely to INR
         function formatCurrency(value) {
             return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
@@ -642,295 +569,358 @@
             }).format(value);
         }
 
-        // Update Dashboard indicators
-        function updateDashboard() {
-            const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
-            document.getElementById('total-amount').textContent = formatCurrency(totalSpent);
-            document.getElementById('salary-display').textContent = formatCurrency(salary);
-
-            const remainAmount = salary - totalSpent;
-            const balanceEl = document.getElementById('remaining-balance');
-            const balanceContainer = document.getElementById('balance-container');
-
-            balanceEl.textContent = formatCurrency(remainAmount);
-
-            if (remainAmount < 0) {
-                balanceContainer.className = "bg-red-50 p-4 border-2 border-brand-pink shadow-flat-sm";
-                balanceEl.className = "text-xl font-black text-brand-pink animate-pulse";
-            } else {
-                balanceContainer.className = "bg-white p-4 border-2 border-black shadow-flat-sm";
-                balanceEl.className = "text-xl font-black text-black";
-            }
-
-            document.getElementById('stat-count').textContent = expenses.length;
-            const avg = expenses.length > 0 ? (totalSpent / expenses.length) : 0;
-            document.getElementById('stat-average').textContent = formatCurrency(avg);
-
-            const usagePercent = salary > 0 ? Math.min(100, Math.round((totalSpent / salary) * 100)) : 0;
-            document.getElementById('budget-percent').textContent = `${usagePercent}% of Salary Spent`;
-
-            const progressBar = document.getElementById('budget-progress-bar');
-            progressBar.style.width = `${usagePercent}%`;
-
-            if (totalSpent > salary) {
-                progressBar.classList.remove('bg-brand-yellow');
-                progressBar.classList.add('bg-brand-pink');
-                document.getElementById('budget-percent').classList.add('text-brand-pink');
-                document.getElementById('budget-percent').classList.remove('text-gray-700');
-            } else {
-                progressBar.classList.remove('bg-brand-pink');
-                progressBar.classList.add('bg-brand-yellow');
-                document.getElementById('budget-percent').classList.remove('text-brand-pink');
-                document.getElementById('budget-percent').classList.add('text-gray-700');
-            }
-
-            renderCategoryBars(totalSpent);
-        }
-
-        // Add transaction entry to database
-        document.getElementById('expense-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!workspaceId) return;
-
-            const titleInput = document.getElementById('item-title');
-            const amountInput = document.getElementById('item-amount');
-            const categorySelect = document.getElementById('item-category');
-            const dateInput = document.getElementById('item-date');
-
-            const expensePayload = {
-                title: titleInput.value.trim(),
-                amount: parseFloat(amountInput.value),
-                category: categorySelect.value,
-                date: dateInput.value,
-                timestamp: Date.now()
-            };
-
-            if (isLocalFallback) {
-                const payloadWithId = { id: 'local-' + Date.now(), ...expensePayload };
-                expenses.unshift(payloadWithId);
-                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
-                updateDashboard();
-                renderExpenses();
-                showNotification(`Added local transaction: "${expensePayload.title}"`, "green");
-            } else {
-                try {
-                    const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
-                    await addDoc(expensesColRef, expensePayload);
-                    showNotification(`Added transaction: "${expensePayload.title}"`, "green");
-                } catch (error) {
-                    console.error("Firestore push error: ", error);
-                    showNotification("Sync Failed: Check configuration.", "pink");
+        // Filter elements by clicked month tab
+        window.filterByMonth = (monthIndex) => {
+            selectedMonth = monthIndex;
+            
+            // Highlight appropriate Month Tab
+            const tabs = document.querySelectorAll('.month-tab');
+            tabs.forEach((tab, index) => {
+                if (index === monthIndex) {
+                    tab.classList.add('border-brandGreen', 'text-white');
+                    tab.classList.remove('border-transparent', 'text-zinc-500');
+                    // Scroll tab smoothly into view if needed
+                    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    tab.classList.remove('border-brandGreen', 'text-white');
+                    tab.classList.add('border-transparent', 'text-zinc-500');
                 }
-            }
-
-            titleInput.value = '';
-            amountInput.value = '';
-            document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
-        });
-
-        // Delete specific entry securely
-        window.deleteExpense = async (expenseId) => {
-            if (!workspaceId) return;
-
-            if (isLocalFallback) {
-                expenses = expenses.filter(e => e.id !== expenseId);
-                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
-                updateDashboard();
-                renderExpenses();
-                showNotification("Transaction deleted from local storage", "pink");
-            } else {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, expenseId);
-                    await deleteDoc(docRef);
-                    showNotification("Transaction deleted from cloud ledger", "pink");
-                } catch (error) {
-                    console.error("Firestore delete error: ", error);
-                    showNotification("Could not delete record.", "pink");
-                }
-            }
-        };
-
-        // Render Ledger Entries
-        function renderExpenses() {
-            const listEl = document.getElementById('ledger-list');
-            listEl.innerHTML = '';
-
-            const selectedCat = document.getElementById('filter-category').value;
-            const sortOrder = document.getElementById('sort-order').value;
-            const searchQuery = document.getElementById('search-ledger').value.toLowerCase().trim();
-
-            let filtered = expenses.filter(item => {
-                const matchesCategory = selectedCat === "ALL" || item.category === selectedCat;
-                const matchesSearch = item.title.toLowerCase().includes(searchQuery);
-                return matchesCategory && matchesSearch;
             });
 
-            // Sort
-            if (sortOrder === "date-desc") {
-                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (sortOrder === "date-asc") {
-                filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-            } else if (sortOrder === "amount-desc") {
-                filtered.sort((a, b) => b.amount - a.amount);
-            } else if (sortOrder === "amount-asc") {
-                filtered.sort((a, b) => a.amount - b.amount);
+            updateDashboard();
+        };
+
+        // Update Dashboard indicators and metrics
+        function updateDashboard() {
+            // Filter expenses strictly to the active selected month
+            const filteredExpenses = expenses.filter(item => {
+                const itemDate = new Date(item.date);
+                // Handle timezone safe comparisons
+                const itemMonth = itemDate.getUTCMonth();
+                return itemMonth === selectedMonth;
+            });
+
+            // Calculate metrics
+            const totalSpent = filteredExpenses.reduce((sum, item) => sum + item.amount, 0);
+            
+            document.getElementById('total-expense-display').textContent = formatCurrency(totalSpent);
+            document.getElementById('salary-display').textContent = formatCurrency(salary);
+
+            // Set metric total spent inside chart center
+            document.getElementById('center-total-display').textContent = formatCurrency(totalSpent);
+
+            // Re-render visual chart and details ledger
+            drawDoughnutChart(filteredExpenses, totalSpent);
+            renderLedgerList(filteredExpenses);
+        }
+
+        // Generates clean segmented circular sections on SVG directly
+        function drawDoughnutChart(filteredExpenses, totalSpent) {
+            const chartSvg = document.getElementById('doughnut-chart-svg');
+            const legendList = document.getElementById('chart-legend-list');
+
+            // Reset list and keep basic background circle
+            chartSvg.innerHTML = '<circle cx="60" cy="60" r="46" fill="none" stroke="#2C2C2E" stroke-width="12" />';
+            legendList.innerHTML = '';
+
+            if (filteredExpenses.length === 0 || totalSpent === 0) {
+                legendList.innerHTML = `<div class="col-span-3 text-center py-2 text-zinc-500 text-xs font-semibold lowercase tracking-wide">No transactions recorded.</div>`;
+                return;
             }
 
-            document.getElementById('filtered-count').textContent = `Showing ${filtered.length} / ${expenses.length} entries`;
+            // Sum per category
+            const categorySums = {};
+            Object.keys(categoryColors).forEach(cat => categorySums[cat] = 0);
+            filteredExpenses.forEach(item => {
+                if (categorySums[item.category] !== undefined) {
+                    categorySums[item.category] += item.amount;
+                }
+            });
 
-            if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="p-8 text-center uppercase text-xs font-bold text-gray-500 tracking-wider">
-                        No transactions found matching workspace filters.
+            // Calculate percentage segments
+            const segments = [];
+            Object.entries(categorySums).forEach(([category, sum]) => {
+                if (sum > 0) {
+                    const percentage = (sum / totalSpent) * 100;
+                    segments.push({ category, sum, percentage });
+                }
+            });
+
+            // Radius parameters matching style: cx=60, cy=60, r=46
+            const radius = 46;
+            const circumference = 2 * Math.PI * radius; // Approx 289.026
+
+            let currentOffset = 0;
+            // Introduce a subtle spacing gap between segments if there are multiple segments
+            const spacingGap = segments.length > 1 ? 1.5 : 0; 
+            const totalGapsOffset = spacingGap * segments.length;
+
+            segments.forEach((segment) => {
+                const colors = categoryColors[segment.category];
+                
+                // Segment length with gaps factored out
+                const adjustedPercentage = segment.percentage - (spacingGap / segments.length);
+                const strokeLength = (adjustedPercentage / 100) * circumference;
+                const remainingSpace = circumference - strokeLength;
+
+                // Create dynamic circle path representation
+                const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circleNode.setAttribute("cx", "60");
+                circleNode.setAttribute("cy", "60");
+                circleNode.setAttribute("r", radius.toString());
+                circleNode.setAttribute("fill", "none");
+                circleNode.setAttribute("stroke", colors.fill);
+                circleNode.setAttribute("stroke-width", "12");
+                circleNode.setAttribute("stroke-dasharray", `${strokeLength} ${remainingSpace}`);
+                circleNode.setAttribute("stroke-dashoffset", (-currentOffset).toString());
+                circleNode.setAttribute("class", "chart-segment");
+                
+                chartSvg.appendChild(circleNode);
+
+                // Accumulate progress
+                currentOffset += strokeLength + (spacingGap / 100 * circumference);
+
+                // Render matching label entry beneath chart
+                const pillHtml = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${colors.fill}"></span>
+                        <span class="truncate block text-zinc-300 text-[10px] lowercase max-w-[80px]">${segment.category.split(' ')[0]}</span>
+                        <span class="text-white text-[10px] font-bold">${Math.round(segment.percentage)}%</span>
+                    </div>
+                `;
+                legendList.insertAdjacentHTML('beforeend', pillHtml);
+            });
+        }
+
+        // Render dynamic historical ledger logs
+        function renderLedgerList(filteredExpenses) {
+            const listContainer = document.getElementById('ledger-list');
+            listContainer.innerHTML = '';
+
+            document.getElementById('filtered-count').textContent = `${filteredExpenses.length} Entries`;
+
+            if (filteredExpenses.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-12 text-zinc-600 text-xs font-semibold uppercase tracking-wider">
+                        No transactions registered for this month.
                     </div>
                 `;
                 return;
             }
 
-            filtered.forEach(item => {
-                const colorSet = categoryColors[item.category] || { bg: 'bg-zinc-500', border: 'border-zinc-500' };
+            // Sort newest timestamp first
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            filteredExpenses.forEach(item => {
+                const colors = categoryColors[item.category] || { text: 'text-zinc-500', bg: 'bg-zinc-800', fill: '#888' };
                 const formattedDate = new Date(item.date).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
-                    year: 'numeric',
                     timeZone: 'UTC'
                 });
 
-                const ledgerRow = `
-                    <div class="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-2.5 h-10 shrink-0 ${colorSet.bg} border border-black"></div>
+                const rowHtml = `
+                    <div class="bg-darkCard hover:bg-zinc-800/40 p-4 rounded-2xl border border-zinc-800/80 transition-all flex justify-between items-center gap-4 group">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <!-- Rounded custom visual category identifier icon background -->
+                            <div class="w-10 h-10 shrink-0 rounded-xl ${colors.bg} border border-zinc-800/30 flex items-center justify-center">
+                                <span class="w-3 h-3 rounded-full" style="background-color: ${colors.fill}"></span>
+                            </div>
+
                             <div class="min-w-0">
-                                <h4 class="text-sm font-bold uppercase truncate text-black group-hover:text-brand-orange transition-colors">${item.title}</h4>
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 font-bold uppercase mt-0.5">
+                                <h4 class="text-sm font-bold text-white truncate uppercase">${item.title}</h4>
+                                <div class="flex items-center gap-2 mt-0.5 text-[10px] text-zinc-500 font-bold uppercase">
                                     <span>${formattedDate}</span>
                                     <span>•</span>
-                                    <span class="text-gray-600">${item.category}</span>
+                                    <span class="${colors.text}">${item.category}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-3 shrink-0">
-                            <span class="text-base font-extrabold text-black font-mono">${formatCurrency(item.amount)}</span>
+                            <span class="text-sm font-bold text-white tracking-wide font-mono">${formatCurrency(item.amount)}</span>
+                            
+                            <!-- Sleek delete entry icon trigger button -->
                             <button onclick="deleteExpense('${item.id}')" aria-label="Delete entry"
-                                    class="bg-brand-pink text-black p-2 hover:bg-red-500 border-2 border-black active:translate-y-[1px] transition-all flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="square" stroke-linejoin="miter" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    class="p-2 text-zinc-600 hover:text-brandPink rounded-xl bg-zinc-900 border border-zinc-800 hover:border-brandPink/30 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
                         </div>
                     </div>
                 `;
-                listEl.insertAdjacentHTML('beforeend', ledgerRow);
+                listContainer.insertAdjacentHTML('beforeend', rowHtml);
             });
         }
 
-        // Draw Allocations
-        function renderCategoryBars(totalSpent) {
-            const container = document.getElementById('category-distribution-container');
-            container.innerHTML = '';
+        // Form submits dynamic transactions
+        window.handleExpenseSubmit = async (e) => {
+            e.preventDefault();
+            if (!workspaceId) return;
 
-            if (expenses.length === 0) {
-                container.innerHTML = `<div class="text-gray-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>`;
-                return;
+            const titleInput = document.getElementById('item-title');
+            const amountInput = document.getElementById('item-amount');
+            const categoryInput = document.getElementById('item-category');
+            const dateInput = document.getElementById('item-date');
+
+            const payload = {
+                title: titleInput.value.trim(),
+                amount: parseFloat(amountInput.value),
+                category: categoryInput.value,
+                date: dateInput.value,
+                timestamp: Date.now()
+            };
+
+            if (isLocalFallback) {
+                const uniqueId = 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                expenses.unshift({ id: uniqueId, ...payload });
+                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
+                updateDashboard();
+                closeAddExpenseSheet();
+                showNotification(`Added local transaction: "${payload.title}"`, "green");
+            } else {
+                try {
+                    const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+                    await addDoc(expensesColRef, payload);
+                    closeAddExpenseSheet();
+                    showNotification(`Added transaction: "${payload.title}"`, "green");
+                } catch (error) {
+                    console.error("Firestore push error: ", error);
+                    showNotification("Database Synchronization Failed", "pink");
+                }
             }
 
-            const sums = {};
-            Object.keys(categoryColors).forEach(cat => sums[cat] = 0);
-            expenses.forEach(item => {
-                if (sums[item.category] !== undefined) sums[item.category] += item.amount;
+            // Reset Inputs
+            titleInput.value = '';
+            amountInput.value = '';
+            dateInput.value = new Date().toISOString().split('T')[0];
+            selectCategoryPill('Food & Dining');
+        };
+
+        // Removes dynamic record
+        window.deleteExpense = async (expenseId) => {
+            if (!workspaceId) return;
+
+            if (isLocalFallback) {
+                expenses = expenses.filter(item => item.id !== expenseId);
+                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
+                updateDashboard();
+                showNotification("Transaction deleted locally", "pink");
+            } else {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, expenseId);
+                    await deleteDoc(docRef);
+                    showNotification("Transaction removed from cloud database", "pink");
+                } catch (error) {
+                    console.error("Firestore record deletion error: ", error);
+                }
+            }
+        };
+
+        // Select dynamic categories inside the bottom sheet
+        window.selectCategoryPill = (catName) => {
+            document.getElementById('item-category').value = catName;
+            
+            // Highlight active visual indicator pill
+            const pills = document.querySelectorAll('.cat-pill');
+            pills.forEach((pill) => {
+                const isSelected = (pill.textContent.trim().toLowerCase() === catName.split(' ')[0].toLowerCase());
+                const colors = categoryColors[catName];
+                
+                if (isSelected) {
+                    pill.className = `cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border} transition-colors uppercase`;
+                } else {
+                    pill.className = `cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-500 border border-transparent transition-colors uppercase hover:text-white`;
+                }
             });
+        };
 
-            Object.entries(sums)
-                .sort((a, b) => b[1] - a[1])
-                .forEach(([cat, amt]) => {
-                    if (amt === 0) return;
-                    const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
-                    const colorSet = categoryColors[cat] || { bg: 'bg-zinc-500' };
-
-                    const itemHtml = `
-                        <div class="bg-white p-3 border-2 border-black flex flex-col gap-1.5 hover:border-brand-yellow transition-all">
-                            <div class="flex justify-between items-baseline text-xs font-bold uppercase">
-                                <span class="flex items-center gap-2">
-                                    <span class="w-3.5 h-3.5 block ${colorSet.bg} border border-black"></span>
-                                    <span>${cat}</span>
-                                </span>
-                                <span>${formatCurrency(amt)} <span class="text-gray-500 text-[10px]">(${pct}%)</span></span>
-                            </div>
-                            <div class="w-full bg-gray-100 h-4 border-2 border-black p-0.5">
-                                <div class="h-full ${colorSet.bg} transition-all duration-300" style="width: ${pct}%"></div>
-                            </div>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', itemHtml);
-                });
-        }
-
-        // Populating Sample Demo Data
-        const demoData = [
-            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
-            { title: "Monthly Fuel Refill", amount: 4500, category: "Transport & Auto", date: getOffsetDate(-2) },
-            { title: "Concert Access & Cinema Passes", amount: 3500, category: "Entertainment", date: getOffsetDate(-4) },
-            { title: "Home Broadband & Utility Bills", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
-            { title: "Tactile Keyboard Upgrade", amount: 9500, category: "Shopping & Custom", date: getOffsetDate(-8) },
-            { title: "Premium Roast Coffee Beans", amount: 1200, category: "Food & Dining", date: getOffsetDate(-10) }
-        ];
-
+        // POPULATE DEMO DATA SETUP
         document.getElementById('btn-demo').addEventListener('click', () => {
             if (!workspaceId) return;
-            showConfirm("This will write mock demo transactions into your current Workspace. Proceed?", async () => {
+            showConfirm("Populate mock sample logs in your workspace?", async () => {
                 if (isLocalFallback) {
-                    const prepData = demoData.map((item, idx) => ({
-                        id: 'demo-' + idx + '-' + Date.now(),
+                    const mappedDemo = demoData.map((item, index) => ({
+                        id: `local-demo-${index}-${Date.now()}`,
                         ...item,
-                        timestamp: Date.now()
+                        // Offset matching current selected month target
+                        date: getOffsetDateForMonth(-index)
                     }));
-                    expenses = [...prepData, ...expenses];
+                    expenses = [...mappedDemo, ...expenses];
                     localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
                     updateDashboard();
-                    renderExpenses();
-                    showNotification("Demo data successfully loaded locally", "yellow");
+                    showNotification("Local mock logs successfully prepared", "green");
                 } else {
                     const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
-                    for (const item of demoData) {
-                        await addDoc(expensesColRef, { ...item, timestamp: Date.now() });
+                    for (let i = 0; i < demoData.length; i++) {
+                        const item = demoData[i];
+                        await addDoc(expensesColRef, {
+                            ...item,
+                            date: getOffsetDateForMonth(-i)
+                        });
                     }
-                    showNotification("Demo Cloud data successfully synchronized", "yellow");
+                    showNotification("Cloud Workspace database populated", "green");
                 }
             });
         });
 
-        // Wiping Cloud Workspace Data
+        // Wipes all log parameters out
         document.getElementById('btn-clear').addEventListener('click', () => {
             if (!workspaceId) return;
-            showConfirm("Are you sure you want to delete all entries from your workspace ledger?", async () => {
+            showConfirm("Wipe entire logs history in your database profile?", async () => {
                 if (isLocalFallback) {
                     expenses = [];
-                    localStorage.removeItem(`expenses-${workspaceId}`);
+                    localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify([]));
                     updateDashboard();
-                    renderExpenses();
-                    showNotification("Local workspace ledger wiped.", "pink");
+                    showNotification("Local database wiped successfully.", "pink");
                 } else {
+                    // Wipe Firestore entries
                     for (const item of expenses) {
                         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, item.id);
                         await deleteDoc(docRef);
                     }
-                    showNotification("Cloud workspace data completely wiped.", "pink");
+                    showNotification("Cloud database wiped successfully.", "pink");
                 }
             });
         });
 
-        // Salary Modal updates
-        document.getElementById('btn-update-salary').addEventListener('click', () => {
+        // Helper to map demo logs inside currently targeted month
+        function getOffsetDateForMonth(daysOffset) {
+            const date = new Date();
+            date.setMonth(selectedMonth);
+            date.setDate(date.getDate() + daysOffset);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Slide-in Add Bottom Sheet Dialogs
+        window.openAddExpenseSheet = () => {
+            const sheet = document.getElementById('add-expense-sheet');
+            sheet.classList.remove('hidden');
+            setTimeout(() => {
+                sheet.firstElementChild.classList.remove('translate-y-full');
+            }, 10);
+        };
+
+        window.closeAddExpenseSheet = () => {
+            const sheet = document.getElementById('add-expense-sheet');
+            sheet.firstElementChild.classList.add('translate-y-full');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+            }, 300);
+        };
+
+        // Slide-in update monthly balance/income modal
+        window.openSalaryModal = () => {
             document.getElementById('new-salary-input').value = salary;
             document.getElementById('salary-modal').classList.remove('hidden');
-        });
+        };
 
-        document.getElementById('btn-close-salary-modal').addEventListener('click', () => {
+        window.closeSalaryModal = () => {
             document.getElementById('salary-modal').classList.add('hidden');
-        });
+        };
 
-        document.getElementById('btn-save-salary').addEventListener('click', async () => {
+        window.saveSalary = async () => {
             if (!workspaceId) return;
             const inputVal = parseFloat(document.getElementById('new-salary-input').value);
             if (!isNaN(inputVal) && inputVal > 0) {
@@ -938,62 +928,23 @@
                     salary = inputVal;
                     localStorage.setItem(`salary-${workspaceId}`, salary.toString());
                     updateDashboard();
-                    document.getElementById('salary-modal').classList.add('hidden');
-                    showNotification("Salary parameters synchronized locally", "green");
+                    closeSalaryModal();
+                    showNotification("Local monthly balance targets updated", "green");
                 } else {
                     try {
                         const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
                         await setDoc(settingsDocRef, { salary: inputVal }, { merge: true });
-                        document.getElementById('salary-modal').classList.add('hidden');
-                        showNotification("Salary parameters synchronized", "green");
+                        closeSalaryModal();
+                        showNotification("Cloud monthly balance target updated", "green");
                     } catch (error) {
-                        console.error("Firestore settings set error: ", error);
+                        console.error("Firestore settings saving error: ", error);
                     }
                 }
             }
-        });
+        };
 
-        // Event hooks for filters/sort
-        document.getElementById('filter-category').addEventListener('change', renderExpenses);
-        document.getElementById('sort-order').addEventListener('change', renderExpenses);
-        document.getElementById('search-ledger').addEventListener('input', renderExpenses);
-
-        // Toast trigger helper
-        function showNotification(message, type = "green") {
-            const toast = document.getElementById('toast-notification');
-            const indicator = document.getElementById('toast-indicator');
-            const text = document.getElementById('toast-text');
-
-            text.textContent = message;
-            indicator.className = "w-4 h-4 border border-black";
-            if (type === "green") indicator.className += " bg-brand-green";
-            if (type === "pink") indicator.className += " bg-brand-pink";
-            if (type === "blue") indicator.className += " bg-brand-blue";
-            if (type === "yellow") indicator.className += " bg-brand-yellow";
-
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 4000);
-        }
-
-        // Custom Confirmation dialog helper
-        function showConfirm(message, onOk) {
-            const modal = document.getElementById('confirm-modal');
-            const msgEl = document.getElementById('confirm-message');
-            const cancelBtn = document.getElementById('confirm-cancel');
-            const okBtn = document.getElementById('confirm-ok');
-
-            msgEl.textContent = message;
-            modal.classList.remove('hidden');
-
-            const close = () => modal.classList.add('hidden');
-            cancelBtn.onclick = () => { close(); };
-            okBtn.onclick = () => { close(); onOk(); };
-        }
-
-        // Export as CSV
-        document.getElementById('btn-export').addEventListener('click', () => {
+        // Export active ledger entries directly to CSV
+        window.downloadCSV = () => {
             if (expenses.length === 0) {
                 showNotification("No transactions to export!", "pink");
                 return;
@@ -1015,8 +966,42 @@
             link.click();
             document.body.removeChild(link);
 
-            showNotification("Ledger CSV downloaded", "green");
-        });
+            showNotification("Ledger exported successfully", "green");
+        };
+
+        // Toast indicator triggers
+        function showNotification(message, type = "green") {
+            const toast = document.getElementById('toast-notification');
+            const indicator = document.getElementById('toast-indicator');
+            const text = document.getElementById('toast-text');
+
+            text.textContent = message;
+            indicator.className = "w-4 h-4 border border-black";
+            if (type === "green") indicator.classList.add("bg-brandGreen");
+            if (type === "pink") indicator.classList.add("bg-brandPink");
+            if (type === "blue") indicator.classList.add("bg-brandBlue");
+            if (type === "yellow") indicator.classList.add("bg-brandYellow");
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Custom modal confirmation alerts
+        function showConfirm(message, onOk) {
+            const modal = document.getElementById('confirm-modal');
+            const msgEl = document.getElementById('confirm-message');
+            const cancelBtn = document.getElementById('confirm-cancel');
+            const okBtn = document.getElementById('confirm-ok');
+
+            msgEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const close = () => modal.classList.add('hidden');
+            cancelBtn.onclick = () => { close(); };
+            okBtn.onclick = () => { close(); onOk(); };
+        }
     </script>
 </body>
 </html>
