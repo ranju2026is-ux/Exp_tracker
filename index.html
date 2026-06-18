@@ -93,12 +93,13 @@
                        class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm">
             </div>
 
-            <div class="bg-black/40 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-500 tracking-wider text-center">
-                Note: Sign in is securely synchronized to persistent storage.
+            <!-- Real-time database warning -->
+            <div id="db-status-badge" class="bg-black/40 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center">
+                Checking Cloud Status...
             </div>
 
             <button type="submit" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
-                Unlock Real-time Workspace
+                Unlock Workspace
             </button>
         </form>
     </div>
@@ -112,7 +113,7 @@
                 <div>
                     <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
                     <p class="text-xs sm:text-sm font-bold uppercase mt-1 tracking-wider">
-                        Welcome, <span id="user-display" class="underline text-black font-black">User</span>! Active INR Cloud Workspace
+                        Welcome, <span id="user-display" class="underline text-black font-black">User</span>! Active <span id="workspace-mode-label" class="bg-black text-white px-2 py-0.5 font-black text-[10px]">LOCAL</span> Workspace
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -364,7 +365,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                apiKey: "",
+                apiKey: "", // Blank in offline environments
                 authDomain: "square-expense-realtime.firebaseapp.com",
                 projectId: "square-expense-realtime",
                 storageBucket: "square-expense-realtime.appspot.com",
@@ -372,16 +373,74 @@
                 appId: "1:1234:web:abcd"
             };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // App State
+        // Offline / Local Storage fallback state
+        let isLocalFallback = false;
         let expenses = [];
         let salary = 75000; // Default Salary
-        let user = null;
         let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
+        let user = null; // Firebase user
+        
+        // Define clean connection timeout (If database doesn't respond in 2.5 seconds, we skip directly to local offline mode!)
+        const connectionTimeout = setTimeout(() => {
+            if (!workspaceId) {
+                console.warn("Cloud connection handshake timed out. Activating Local Secure Mode.");
+                activateOfflineFallback("Cloud Connection Timeout (Local Mode Active)");
+            }
+        }, 2500);
+
+        function activateOfflineFallback(reason) {
+            isLocalFallback = true;
+            clearTimeout(connectionTimeout);
+            
+            // Hide loading indicator, show login screen immediately so they are not stuck!
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            
+            const badge = document.getElementById('db-status-badge');
+            badge.textContent = "Offline Secure Mode Active (Local Storage Enabled)";
+            badge.className = "bg-brand-orange/20 p-3 border border-brand-orange text-[11px] font-bold uppercase text-brand-orange tracking-wider text-center";
+            
+            document.getElementById('workspace-mode-label').textContent = "LOCAL OFFLINE";
+            document.getElementById('workspace-mode-label').className = "bg-brand-orange text-black px-2 py-0.5 font-black text-[10px]";
+        }
+
+        // Initialize Firebase safely
+        let app, auth, db;
+        try {
+            if (firebaseConfig.apiKey) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // Establish connection listen
+                onAuthStateChanged(auth, (firebaseUser) => {
+                    user = firebaseUser;
+                    clearTimeout(connectionTimeout);
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    if (user) {
+                        document.getElementById('login-screen').classList.remove('hidden');
+                        const badge = document.getElementById('db-status-badge');
+                        badge.textContent = "Cloud Handshake Verified. Real-time Synced Database Active.";
+                        badge.className = "bg-brand-green/20 p-3 border border-brand-green text-[11px] font-bold uppercase text-brand-green tracking-wider text-center";
+                        document.getElementById('workspace-mode-label').textContent = "SECURE CLOUD";
+                        document.getElementById('workspace-mode-label').className = "bg-brand-green text-black px-2 py-0.5 font-black text-[10px]";
+                    }
+                });
+
+                // Init session Handshake
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } else {
+                // No API key provided, switch instantly to local offline mode
+                activateOfflineFallback("No Firebase API Key configured");
+            }
+        } catch (e) {
+            console.error("Firebase Handshake Exception: ", e);
+            activateOfflineFallback("Database Initialization Error");
+        }
 
         const categoryColors = {
             'Food & Dining': { bg: 'bg-brand-yellow', border: 'border-brand-yellow', hex: '#FFE600' },
@@ -417,42 +476,9 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
         }
 
-        // 1. Authenticate with custom token priority or fallback anonymously
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Authentication handshake error: ", error);
-                showNotification("Auth Failed. Running in Secure Sandbox Mode.", "pink");
-            }
-        };
-
-        // Initialize handshake right away
-        initAuth();
-
-        // Listen for Auth changes
-        onAuthStateChanged(auth, (firebaseUser) => {
-            user = firebaseUser;
-            // Hide loading indicator, show login screen if not already unlocked
-            document.getElementById('loading-screen').classList.add('hidden');
-            if (user) {
-                // Keep login screen visible until user fills in credentials
-                document.getElementById('login-screen').classList.remove('hidden');
-            }
-        });
-
         // Form Submission to unlock the Workspace
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!user) {
-                showNotification("Waiting for secure cloud connection...", "pink");
-                return;
-            }
-
             const usernameVal = document.getElementById('login-username').value;
             const passwordVal = document.getElementById('login-password').value;
 
@@ -469,10 +495,28 @@
             // Set current date selector
             document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
 
-            // Setup Realtime Database synchronization
-            startRealtimeListeners();
-            showNotification(`Handshake verified. Secure session loaded: ${usernameVal.toUpperCase()}`, "green");
+            if (isLocalFallback) {
+                startLocalListeners();
+                showNotification(`Offline session loaded locally: ${usernameVal.toUpperCase()}`, "yellow");
+            } else {
+                startRealtimeListeners();
+                showNotification(`Handshake verified. Secure cloud session loaded: ${usernameVal.toUpperCase()}`, "green");
+            }
         });
+
+        // Local state initializer
+        function startLocalListeners() {
+            // Retrieve local salary
+            const cachedSalary = localStorage.getItem(`salary-${workspaceId}`);
+            salary = cachedSalary ? parseFloat(cachedSalary) : 75000;
+
+            // Retrieve local expenses
+            const cachedExpenses = localStorage.getItem(`expenses-${workspaceId}`);
+            expenses = cachedExpenses ? JSON.parse(cachedExpenses) : [];
+
+            updateDashboard();
+            renderExpenses();
+        }
 
         // Sync Firestore Listeners
         let unsubscribeSettings = null;
@@ -481,17 +525,14 @@
         function startRealtimeListeners() {
             if (!user) return;
 
-            // Define references based on strict structure rules
-            // RULE 1: /artifacts/{appId}/users/{userId}/{collectionName}/{docId}
             const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
             const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
 
-            // 1. Sync User settings (e.g. Salary, Target settings)
+            // 1. Sync User settings
             unsubscribeSettings = onSnapshot(settingsDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     salary = docSnap.data().salary || 75000;
                 } else {
-                    // Create default settings on the cloud immediately
                     setDoc(settingsDocRef, { salary: 75000 });
                 }
                 updateDashboard();
@@ -594,10 +635,10 @@
             renderCategoryBars(totalSpent);
         }
 
-        // Add transaction entry to Firestore database
+        // Add transaction entry to database
         document.getElementById('expense-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!user || !workspaceId) return;
+            if (!workspaceId) return;
 
             const titleInput = document.getElementById('item-title');
             const amountInput = document.getElementById('item-amount');
@@ -612,32 +653,50 @@
                 timestamp: Date.now()
             };
 
-            try {
-                const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
-                await addDoc(expensesColRef, expensePayload);
-                showNotification(`Added transaction: "${expensePayload.title}"`, "green");
-
-                // Reset forms
-                titleInput.value = '';
-                amountInput.value = '';
-                document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
-            } catch (error) {
-                console.error("Firestore push error: ", error);
-                showNotification("Sync Failed: Check configuration.", "pink");
+            if (isLocalFallback) {
+                // Add local element
+                const payloadWithId = { id: 'local-' + Date.now(), ...expensePayload };
+                expenses.unshift(payloadWithId);
+                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
+                updateDashboard();
+                renderExpenses();
+                showNotification(`Added local transaction: "${expensePayload.title}"`, "green");
+            } else {
+                try {
+                    const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+                    await addDoc(expensesColRef, expensePayload);
+                    showNotification(`Added transaction: "${expensePayload.title}"`, "green");
+                } catch (error) {
+                    console.error("Firestore push error: ", error);
+                    showNotification("Sync Failed: Check configuration.", "pink");
+                }
             }
+
+            // Reset forms
+            titleInput.value = '';
+            amountInput.value = '';
+            document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
         });
 
-        // Delete specific entry from Firestore securely
+        // Delete specific entry securely
         window.deleteExpense = async (expenseId) => {
-            if (!user || !workspaceId) return;
+            if (!workspaceId) return;
 
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, expenseId);
-                await deleteDoc(docRef);
-                showNotification("Transaction deleted from cloud ledger", "pink");
-            } catch (error) {
-                console.error("Firestore delete error: ", error);
-                showNotification("Could not delete record.", "pink");
+            if (isLocalFallback) {
+                expenses = expenses.filter(e => e.id !== expenseId);
+                localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
+                updateDashboard();
+                renderExpenses();
+                showNotification("Transaction deleted from local storage", "pink");
+            } else {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, expenseId);
+                    await deleteDoc(docRef);
+                    showNotification("Transaction deleted from cloud ledger", "pink");
+                } catch (error) {
+                    console.error("Firestore delete error: ", error);
+                    showNotification("Could not delete record.", "pink");
+                }
             }
         };
 
@@ -757,27 +816,48 @@
                 });
         }
 
-        // Populating Cloud Sample Demo Data
+        // Populating Sample Demo Data
         document.getElementById('btn-demo').addEventListener('click', () => {
-            if (!user || !workspaceId) return;
-            showConfirm("This will write mock demo transactions into your secure Cloud Ledger. Proceed?", async () => {
-                const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
-                for (const item of demoData) {
-                    await addDoc(expensesColRef, { ...item, timestamp: Date.now() });
+            if (!workspaceId) return;
+            showConfirm("This will write mock demo transactions into your current Workspace. Proceed?", async () => {
+                if (isLocalFallback) {
+                    const prepData = demoData.map((item, idx) => ({
+                        id: 'demo-' + idx + '-' + Date.now(),
+                        ...item,
+                        timestamp: Date.now()
+                    }));
+                    expenses = [...prepData, ...expenses];
+                    localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
+                    updateDashboard();
+                    renderExpenses();
+                    showNotification("Demo data successfully loaded locally", "yellow");
+                } else {
+                    const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+                    for (const item of demoData) {
+                        await addDoc(expensesColRef, { ...item, timestamp: Date.now() });
+                    }
+                    showNotification("Demo Cloud data successfully synchronized", "yellow");
                 }
-                showNotification("Demo Cloud data successfully synchronized", "yellow");
             });
         });
 
         // Wiping Cloud Workspace Data
         document.getElementById('btn-clear').addEventListener('click', () => {
-            if (!user || !workspaceId) return;
-            showConfirm("Are you sure you want to delete all entries from your cloud workspace ledger?", async () => {
-                for (const item of expenses) {
-                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, item.id);
-                    await deleteDoc(docRef);
+            if (!workspaceId) return;
+            showConfirm("Are you sure you want to delete all entries from your workspace ledger?", async () => {
+                if (isLocalFallback) {
+                    expenses = [];
+                    localStorage.removeItem(`expenses-${workspaceId}`);
+                    updateDashboard();
+                    renderExpenses();
+                    showNotification("Local workspace ledger wiped.", "pink");
+                } else {
+                    for (const item of expenses) {
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, item.id);
+                        await deleteDoc(docRef);
+                    }
+                    showNotification("Cloud workspace data completely wiped.", "pink");
                 }
-                showNotification("Cloud workspace data completely wiped.", "pink");
             });
         });
 
@@ -792,16 +872,24 @@
         });
 
         document.getElementById('btn-save-salary').addEventListener('click', async () => {
-            if (!user || !workspaceId) return;
+            if (!workspaceId) return;
             const inputVal = parseFloat(document.getElementById('new-salary-input').value);
             if (!isNaN(inputVal) && inputVal > 0) {
-                try {
-                    const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
-                    await setDoc(settingsDocRef, { salary: inputVal }, { merge: true });
+                if (isLocalFallback) {
+                    salary = inputVal;
+                    localStorage.setItem(`salary-${workspaceId}`, salary.toString());
+                    updateDashboard();
                     document.getElementById('salary-modal').classList.add('hidden');
-                    showNotification("Salary parameters synchronized", "green");
-                } catch (error) {
-                    console.error("Firestore settings set error: ", error);
+                    showNotification("Salary parameters synchronized locally", "green");
+                } else {
+                    try {
+                        const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
+                        await setDoc(settingsDocRef, { salary: inputVal }, { merge: true });
+                        document.getElementById('salary-modal').classList.add('hidden');
+                        showNotification("Salary parameters synchronized", "green");
+                    } catch (error) {
+                        console.error("Firestore settings set error: ", error);
+                    }
                 }
             }
         });
