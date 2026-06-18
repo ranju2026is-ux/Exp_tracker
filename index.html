@@ -50,7 +50,7 @@
 
         /* Ring segment transitions */
         .chart-segment {
-            transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+            transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease, stroke-width 0.2s ease;
         }
     </style>
 </head>
@@ -236,7 +236,7 @@
                     </div>
                 </div>
 
-                <!-- SELECT CATEGORY PILLS PANEL (Mirrors right design layout) -->
+                <!-- SELECT CATEGORY PILLS PANEL -->
                 <div>
                     <span class="block text-xs font-bold uppercase mb-2.5 text-zinc-400">Select Category</span>
                     <input type="hidden" id="item-category" value="Food & Dining">
@@ -631,18 +631,7 @@
             };
         }
 
-        // Arc path descriptor
-        function describeArc(x, y, radius, startAngle, endAngle) {
-            const start = polarToCartesian(x, y, radius, endAngle);
-            const end = polarToCartesian(x, y, radius, startAngle);
-            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-            return [
-                "M", start.x, start.y, 
-                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-            ].join(" ");
-        }
-
-        // Generates clean segmented circular sections on SVG directly
+        // Generates clean segmented circular sections on SVG directly using robust Stroke-Dasharray
         function drawDoughnutChart(filteredExpenses, totalSpent) {
             const chartSvg = document.getElementById('doughnut-chart-svg');
             const legendList = document.getElementById('chart-legend-list');
@@ -677,51 +666,57 @@
             // Sort largest to smallest for beautiful visual layering
             segments.sort((a, b) => b.sum - a.sum);
 
-            let currentAngle = 0; // Starts from 12 o'clock (via transform rotate-90 inside SVG)
-            const gapDegrees = segments.length > 1 ? 6 : 0; // Space gap between segments
-            const totalGaps = gapDegrees * segments.length;
-            const remainingDegrees = 360 - totalGaps;
+            const r = 46; // radius matching viewBox coordinates
+            const C = 2 * Math.PI * r; // Circumference (~289.027)
+            let accumulatedPercent = 0;
 
             segments.forEach((segment) => {
                 const colors = categoryColors[segment.category];
-                const sweepAngle = (segment.percentage / 100) * remainingDegrees;
                 
-                const startAngle = currentAngle + (gapDegrees / 2);
-                const endAngle = startAngle + sweepAngle;
+                // stroke-dasharray consists of "dash-length gap-length"
+                const dashLength = C * (segment.percentage / 100);
+                
+                // negative stroke-dashoffset shifts segments clockwise
+                const offset = -C * (accumulatedPercent / 100);
 
-                // Create SVG path
-                const pathData = describeArc(60, 60, 46, startAngle, endAngle);
-                
-                const pathNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                pathNode.setAttribute("d", pathData);
-                pathNode.setAttribute("fill", "none");
-                pathNode.setAttribute("stroke", colors.fill);
-                pathNode.setAttribute("stroke-width", "11");
-                pathNode.setAttribute("stroke-linecap", "round");
-                pathNode.setAttribute("class", "chart-segment cursor-pointer transition-all duration-300 hover:stroke-[13]");
-                chartSvg.appendChild(pathNode);
+                // Create SVG Circle Element for perfectly robust segment drawing
+                const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circleNode.setAttribute("cx", "60");
+                circleNode.setAttribute("cy", "60");
+                circleNode.setAttribute("r", r.toString());
+                circleNode.setAttribute("fill", "none");
+                circleNode.setAttribute("stroke", colors.fill);
+                circleNode.setAttribute("stroke-width", "11");
+                circleNode.setAttribute("stroke-dasharray", `${dashLength} ${C}`);
+                circleNode.setAttribute("stroke-dashoffset", offset.toString());
+                circleNode.setAttribute("class", "chart-segment cursor-pointer transition-all duration-300 hover:stroke-[13px]");
+                chartSvg.appendChild(circleNode);
 
-                // Place text precisely inside the segment at midpoint
-                const midAngle = startAngle + (sweepAngle / 2);
-                const textPos = polarToCartesian(60, 60, 46, midAngle);
+                // Place labels straight/horizontally inside mid-point of each color segment
+                const midPercent = accumulatedPercent + segment.percentage / 2;
+                const midAngle = (midPercent / 100) * 360 - 90; // Relative to -90 starting point
+                const textPos = polarToCartesian(60, 60, r, midAngle);
                 
-                // Only render text if the segment sweep is wide enough to hold it gracefully
+                // Only render text if segment is large enough to contain label cleanly
                 if (segment.percentage >= 6) {
                     const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     textNode.setAttribute("x", textPos.x.toString());
-                    textNode.setAttribute("y", (textPos.y + 1).toString()); // slight offset for alignment
+                    textNode.setAttribute("y", (textPos.y + 1).toString()); // minor offset adjustment
                     textNode.setAttribute("fill", "#121214");
                     textNode.setAttribute("font-size", "5.5");
                     textNode.setAttribute("font-weight", "800");
                     textNode.setAttribute("text-anchor", "middle");
                     textNode.setAttribute("dominant-baseline", "middle");
                     textNode.textContent = `${Math.round(segment.percentage)}%`;
+                    
+                    // Counter-rotate the text node back to horizontal so it is readable
+                    textNode.setAttribute("transform", `rotate(90, ${textPos.x}, ${textPos.y})`);
                     chartSvg.appendChild(textNode);
                 }
 
-                currentAngle = endAngle + (gapDegrees / 2);
+                accumulatedPercent += segment.percentage;
 
-                // Render matching label entry beneath chart
+                // Render matching legend items beneath chart
                 const pillHtml = `
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${colors.fill}"></span>
