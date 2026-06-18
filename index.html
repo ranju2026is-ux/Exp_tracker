@@ -19,16 +19,16 @@
                             orange: '#FF5C00',
                             pink: '#FF007A',
                             dark: '#121212',
-                            card: '#1E1E1E'
+                            card: '#FFFFFF' /* Clean White Aesthetic Cards */
                         }
                     },
                     boxShadow: {
-                        'flat-sm': '2px 2px 0px 0px #000000',
-                        'flat-md': '4px 4px 0px 0px #000000',
-                        'flat-lg': '8px 8px 0px 0px #000000',
-                        'flat-yellow': '4px 4px 0px 0px #FFE600',
-                        'flat-blue': '4px 4px 0px 0px #00F0FF',
-                        'flat-green': '4px 4px 0px 0px #39FF14',
+                        'flat-sm': '3px 3px 0px 0px #000000',
+                        'flat-md': '6px 6px 0px 0px #000000',
+                        'flat-lg': '10px 10px 0px 0px #000000',
+                        'flat-yellow': '5px 5px 0px 0px #000000',
+                        'flat-blue': '5px 5px 0px 0px #00F0FF',
+                        'flat-green': '5px 5px 0px 0px #000000',
                     }
                 }
             }
@@ -40,17 +40,17 @@
         
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: #0F0F11;
-            color: #FFFFFF;
+            background-color: #F3F4F6; /* Premium light gray/white aesthetic background */
+            color: #121212;
         }
 
-        /* Customize scrollbar to match square design */
+        /* Customize scrollbar to match clean white design */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #1E1E1E;
+            background: #FFFFFF;
             border: 2px solid #000000;
         }
         ::-webkit-scrollbar-thumb {
@@ -68,45 +68,45 @@
 <body class="min-h-screen flex flex-col p-4 md:p-8 justify-center items-center">
 
     <!-- LOADING SCREEN -->
-    <div id="loading-screen" class="w-full max-w-md bg-brand-card p-8 border-4 border-black shadow-flat-lg flex flex-col items-center gap-4 text-center">
-        <div class="animate-spin w-10 h-10 border-4 border-brand-yellow border-t-transparent"></div>
-        <p class="text-sm font-bold uppercase text-brand-yellow tracking-widest mt-2">Securing Cloud Handshake...</p>
+    <div id="loading-screen" class="w-full max-w-md bg-white p-8 border-4 border-black shadow-flat-lg flex flex-col items-center gap-4 text-center">
+        <div class="animate-spin w-10 h-10 border-4 border-black border-t-brand-yellow"></div>
+        <p class="text-sm font-bold uppercase text-black tracking-widest mt-2">Securing Cloud Handshake...</p>
     </div>
 
     <!-- AUTHENTICATION CONTAINER -->
-    <div id="login-screen" class="hidden w-full max-w-md bg-brand-card border-4 border-black shadow-flat-lg overflow-hidden">
+    <div id="login-screen" class="hidden w-full max-w-md bg-white border-4 border-black shadow-flat-lg overflow-hidden">
         <!-- Tab Switches -->
         <div class="flex border-b-4 border-black">
             <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all">
                 Sign In
             </button>
-            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+            <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black transition-all">
                 Create Workspace
             </button>
         </div>
 
         <div class="p-8 flex flex-col gap-6">
             <div class="text-center">
-                <h1 id="auth-title" class="text-2xl font-black text-white tracking-tight uppercase">SQUARE_SECURE</h1>
-                <p id="auth-subtitle" class="text-xs font-bold text-zinc-400 mt-1 uppercase tracking-wider">Access Your Real-Time Database</p>
+                <h1 id="auth-title" class="text-2xl font-black text-black tracking-tight uppercase">SQUARE_SECURE</h1>
+                <p id="auth-subtitle" class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wider">Access Your Real-Time Database</p>
             </div>
 
             <!-- LOGIN & SIGN UP FORM -->
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
                 <div>
-                    <label for="auth-username" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Username</label>
+                    <label for="auth-username" class="block text-xs font-bold uppercase mb-2 text-gray-700">Username</label>
                     <input type="text" id="auth-username" placeholder="Choose a username" required
-                           class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm uppercase">
+                           class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none text-sm uppercase">
                 </div>
 
                 <div>
-                    <label for="auth-password" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Password</label>
+                    <label for="auth-password" class="block text-xs font-bold uppercase mb-2 text-gray-700">Password</label>
                     <input type="password" id="auth-password" placeholder="••••••••" required
-                           class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm">
+                           class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none text-sm">
                 </div>
 
                 <!-- Database mode visual status -->
-                <div id="db-status-badge" class="bg-black/60 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-400 tracking-wider text-center transition-all">
+                <div id="db-status-badge" class="bg-gray-100 p-3 border border-black text-[11px] font-bold uppercase text-gray-600 tracking-wider text-center transition-all">
                     Scanning Storage Status...
                 </div>
 
@@ -122,7 +122,7 @@
         
         <!-- Header Section -->
         <header class="w-full">
-            <div class="bg-brand-yellow text-brand-dark p-6 border-4 border-black shadow-flat-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="bg-brand-yellow text-black p-6 border-4 border-black shadow-flat-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
                     <p class="text-xs sm:text-sm font-bold uppercase mt-1 tracking-wider">
@@ -130,13 +130,13 @@
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button id="btn-demo" class="bg-black hover:bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
+                    <button id="btn-demo" class="bg-white hover:bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
                         Populate Sample Data
                     </button>
                     <button id="btn-clear" class="bg-brand-pink hover:bg-pink-600 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
                         Clear All Data
                     </button>
-                    <button id="btn-logout" class="bg-white hover:bg-zinc-200 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
+                    <button id="btn-logout" class="bg-white hover:bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
                         Lock Workspace
                     </button>
                 </div>
@@ -150,16 +150,16 @@
             <section class="lg:col-span-5 flex flex-col gap-6">
                 
                 <!-- Quick Stats Board -->
-                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-yellow">Overview Dashboard</h2>
+                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black">Overview Dashboard</h2>
                     
                     <!-- Salary Details Widget -->
-                    <div class="bg-black p-4 border-2 border-brand-green shadow-flat-green flex justify-between items-center">
+                    <div class="bg-white p-4 border-2 border-black shadow-flat-sm flex justify-between items-center">
                         <div>
-                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-0.5">Total Monthly Salary</span>
-                            <span id="salary-display" class="text-2xl font-black text-brand-green">₹0</span>
+                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">Total Monthly Salary</span>
+                            <span id="salary-display" class="text-2xl font-black text-black">₹0</span>
                         </div>
-                        <button id="btn-update-salary" class="bg-brand-green text-black text-xs font-extrabold py-1.5 px-3 border border-black hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm uppercase tracking-wider">
+                        <button id="btn-update-salary" class="bg-brand-yellow text-black text-xs font-extrabold py-1.5 px-3 border border-black hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm uppercase tracking-wider">
                             Update
                         </button>
                     </div>
@@ -167,69 +167,69 @@
                     <!-- Side-by-side: Expenses vs Money Left -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Total Expenses Box -->
-                        <div class="bg-black p-4 border-2 border-brand-pink shadow-flat-sm">
-                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-1">Spent Money</span>
+                        <div class="bg-white p-4 border-2 border-black shadow-flat-sm">
+                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-1">Spent Money</span>
                             <span id="total-amount" class="text-xl font-black text-brand-pink">₹0</span>
                         </div>
 
                         <!-- Remaining Balance Box -->
-                        <div id="balance-container" class="bg-black p-4 border-2 border-brand-blue shadow-flat-sm">
-                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-1">Remain Amount</span>
-                            <span id="remaining-balance" class="text-xl font-black text-brand-blue">₹0</span>
+                        <div id="balance-container" class="bg-white p-4 border-2 border-black shadow-flat-sm">
+                            <span class="text-[10px] font-bold uppercase text-gray-500 block mb-1">Remain Amount</span>
+                            <span id="remaining-balance" class="text-xl font-black text-black">₹0</span>
                         </div>
                     </div>
 
                     <!-- Budget / Salary Usage Box -->
-                    <div class="bg-black p-4 border-2 border-brand-blue flex flex-col gap-2">
+                    <div class="bg-white p-4 border-2 border-black flex flex-col gap-2">
                         <div class="flex justify-between items-baseline">
-                            <span class="text-xs font-bold uppercase text-zinc-400">Salary Utilized</span>
-                            <span id="budget-percent" class="text-xs font-black text-zinc-400">0% Used</span>
+                            <span class="text-xs font-bold uppercase text-gray-500">Salary Utilized</span>
+                            <span id="budget-percent" class="text-xs font-black text-gray-700">0% Used</span>
                         </div>
                         <!-- Square Progress Bar -->
-                        <div class="w-full bg-zinc-800 h-6 border-2 border-black p-0.5">
-                            <div id="budget-progress-bar" class="h-full bg-brand-blue transition-all duration-300" style="width: 0%"></div>
+                        <div class="w-full bg-gray-100 h-6 border-2 border-black p-0.5">
+                            <div id="budget-progress-bar" class="h-full bg-brand-yellow transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
 
                     <!-- Secondary KPI Squares -->
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-zinc-900 p-3 border-2 border-black">
-                            <span class="text-[10px] font-bold uppercase text-zinc-400 block">Total Entries</span>
-                            <span id="stat-count" class="text-xl font-bold text-white">0</span>
+                        <div class="bg-gray-50 p-3 border-2 border-black">
+                            <span class="text-[10px] font-bold uppercase text-gray-500 block">Total Entries</span>
+                            <span id="stat-count" class="text-xl font-bold text-black">0</span>
                         </div>
-                        <div class="bg-zinc-900 p-3 border-2 border-black">
-                            <span class="text-[10px] font-bold uppercase text-zinc-400 block">Avg. Expense</span>
-                            <span id="stat-average" class="text-xl font-bold text-white">₹0</span>
+                        <div class="bg-gray-50 p-3 border-2 border-black">
+                            <span class="text-[10px] font-bold uppercase text-gray-500 block">Avg. Expense</span>
+                            <span id="stat-average" class="text-xl font-bold text-black">₹0</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Add Expense Square Card -->
-                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-green">New Transaction</h2>
+                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black">New Transaction</h2>
                     
                     <form id="expense-form" class="flex flex-col gap-4">
                         <!-- Item Title -->
                         <div>
-                            <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Expense Title / Description</label>
+                            <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-gray-700">Expense Title / Description</label>
                             <input type="text" id="item-title" placeholder="e.g., Grocery shopping, Gas, Chai & Snacks" required
-                                   class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                                   class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
                         </div>
 
                         <!-- Row with Amount and Category -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Amount -->
                             <div>
-                                <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Amount (₹)</label>
+                                <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-gray-700">Amount (₹)</label>
                                 <input type="number" id="item-amount" min="1" step="1" placeholder="0" required
-                                       class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm">
+                                       class="w-full bg-white text-black placeholder-gray-400 font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm">
                             </div>
 
                             <!-- Category Selection -->
                             <div>
-                                <label for="item-category" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Category</label>
+                                <label for="item-category" class="block text-xs font-bold uppercase mb-2 text-gray-700">Category</label>
                                 <select id="item-category" required
-                                        class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                                        class="w-full bg-white text-black font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
                                     <option value="Food & Dining">Food & Dining</option>
                                     <option value="Transport & Auto">Transport</option>
                                     <option value="Entertainment">Entertainment</option>
@@ -242,13 +242,13 @@
 
                         <!-- Date Selection -->
                         <div>
-                            <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Transaction Date</label>
+                            <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-gray-700">Transaction Date</label>
                             <input type="date" id="item-date" required
-                                   class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                                   class="w-full bg-white text-black font-medium p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none transition-colors text-sm uppercase">
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="w-full bg-brand-green hover:bg-emerald-500 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
+                        <button type="submit" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
                             Add Expense Entry
                         </button>
                     </form>
@@ -260,25 +260,25 @@
             <section class="lg:col-span-7 flex flex-col gap-6">
                 
                 <!-- Category Distribution Visualizer -->
-                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-purple mb-4">Category Allocations</h2>
+                <div class="bg-white p-6 border-4 border-black shadow-flat-md">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-black mb-4">Category Allocations</h2>
                     
                     <!-- Square visual bar stack -->
                     <div id="category-distribution-container" class="flex flex-col gap-3">
                         <!-- Dynamic blocks will render here -->
-                        <div class="text-zinc-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>
+                        <div class="text-gray-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>
                     </div>
                 </div>
 
                 <!-- Ledger/History Box -->
-                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex-grow flex flex-col">
+                <div class="bg-white p-6 border-4 border-black shadow-flat-md flex-grow flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-black pb-4 mb-4">
-                        <h2 class="text-lg font-bold uppercase text-brand-orange">Ledger Entries</h2>
+                        <h2 class="text-lg font-bold uppercase text-black">Ledger Entries</h2>
                         
                         <!-- Sorting & Search Control Grid -->
                         <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                             <select id="filter-category"
-                                    class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
+                                    class="bg-white text-black text-xs font-bold p-2 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase w-full sm:w-auto">
                                 <option value="ALL">All Categories</option>
                                 <option value="Food & Dining">Food & Dining</option>
                                 <option value="Transport & Auto">Transport</option>
@@ -289,7 +289,7 @@
                             </select>
 
                             <select id="sort-order"
-                                    class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
+                                    class="bg-white text-black text-xs font-bold p-2 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase w-full sm:w-auto">
                                 <option value="date-desc">Newest First</option>
                                 <option value="date-asc">Oldest First</option>
                                 <option value="amount-desc">Highest Amount</option>
@@ -301,20 +301,20 @@
                     <!-- Ledger Search Bar -->
                     <div class="mb-4">
                         <input type="text" id="search-ledger" placeholder="Filter ledger by title/keyword..." 
-                               class="w-full bg-black text-white placeholder-zinc-600 text-xs font-bold p-3 border-2 border-zinc-800 focus:border-brand-orange focus:outline-none uppercase">
+                               class="w-full bg-white text-black placeholder-gray-400 text-xs font-bold p-3 border-2 border-black focus:bg-yellow-50 focus:outline-none uppercase">
                     </div>
 
                     <!-- Table/List Area -->
-                    <div class="flex-grow overflow-y-auto max-h-[400px] border-2 border-black bg-black">
+                    <div class="flex-grow overflow-y-auto max-h-[400px] border-2 border-black bg-white">
                         <div id="ledger-list" class="divide-y-2 divide-black">
                             <!-- Dynamic expense items will render here -->
                         </div>
                     </div>
                     
                     <!-- Bottom Status -->
-                    <div class="mt-4 flex justify-between items-center text-xs font-bold uppercase text-zinc-500">
+                    <div class="mt-4 flex justify-between items-center text-xs font-bold uppercase text-gray-500">
                         <span id="filtered-count">Showing 0 / 0 entries</span>
-                        <button id="btn-export" class="text-brand-orange hover:underline text-xs uppercase font-extrabold">Export as CSV File</button>
+                        <button id="btn-export" class="text-black underline text-xs uppercase font-extrabold">Export as CSV File</button>
                     </div>
                 </div>
 
@@ -323,44 +323,44 @@
         </main>
 
         <!-- Footer Area -->
-        <footer class="w-full mt-8 border-t-4 border-black pt-4 text-center text-xs font-bold uppercase text-zinc-600 tracking-widest flex flex-col sm:flex-row justify-between gap-2">
+        <footer class="w-full mt-8 border-t-4 border-black pt-4 text-center text-xs font-bold uppercase text-gray-500 tracking-widest flex flex-col sm:flex-row justify-between gap-2">
             <span>SQUARE_EXPENSE © 2026</span>
             <span>Premium Structural Real-Time Dashboard</span>
         </footer>
     </div>
 
     <!-- Interactive Alert / Toast Notification box -->
-    <div id="toast-notification" class="fixed bottom-4 right-4 bg-black text-white p-4 border-4 border-black shadow-flat-sm hidden z-50 transition-all duration-300">
+    <div id="toast-notification" class="fixed bottom-4 right-4 bg-white text-black p-4 border-4 border-black shadow-flat-sm hidden z-50 transition-all duration-300">
         <div class="flex items-center gap-3">
             <div id="toast-indicator" class="w-4 h-4 bg-brand-green border border-black"></div>
-            <p id="toast-text" class="text-xs font-extrabold uppercase tracking-wider"></p>
+            <p id="toast-text" class="text-xs font-extrabold uppercase tracking-wider text-black"></p>
         </div>
     </div>
 
     <!-- Modal for editing/updating monthly salary -->
-    <div id="salary-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-brand-card p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
-            <h3 class="text-xl font-bold uppercase text-brand-green border-b-2 border-black pb-2 mb-4">Set Monthly Salary</h3>
+    <div id="salary-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
+            <h3 class="text-xl font-bold uppercase text-black border-b-2 border-black pb-2 mb-4">Set Monthly Salary</h3>
             <div class="flex flex-col gap-4">
                 <div>
-                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-zinc-400 mb-2">Income Target (₹)</label>
-                    <input type="number" id="new-salary-input" min="1" placeholder="50000" class="w-full bg-black text-white p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none text-sm">
+                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-gray-500 mb-2">Income Target (₹)</label>
+                    <input type="number" id="new-salary-input" min="1" placeholder="50000" class="w-full bg-white text-black p-3 border-2 border-black focus:outline-none text-sm">
                 </div>
                 <div class="flex justify-end gap-2 mt-2">
-                    <button id="btn-close-salary-modal" class="bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black text-xs uppercase">Cancel</button>
-                    <button id="btn-save-salary" class="bg-brand-green text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Save income</button>
+                    <button id="btn-close-salary-modal" class="bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black text-xs uppercase">Cancel</button>
+                    <button id="btn-save-salary" class="bg-brand-yellow text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Save income</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Custom Dialog Box for confirmation prompts -->
-    <div id="confirm-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-brand-card p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
             <h3 class="text-xl font-bold uppercase text-brand-pink border-b-2 border-black pb-2 mb-2">Attention Required</h3>
-            <p id="confirm-message" class="text-sm text-zinc-300 uppercase font-medium mb-6"></p>
+            <p id="confirm-message" class="text-sm text-gray-700 uppercase font-medium mb-6"></p>
             <div class="flex justify-end gap-2">
-                <button id="confirm-cancel" class="bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black text-xs uppercase">No, Cancel</button>
+                <button id="confirm-cancel" class="bg-gray-100 text-black font-bold py-2 px-4 border-2 border-black text-xs uppercase">No, Cancel</button>
                 <button id="confirm-ok" class="bg-brand-pink text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Yes, Proceed</button>
             </div>
         </div>
@@ -378,7 +378,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                apiKey: "", // Left blank for local/GitHub Pages setup initially
+                apiKey: "", // Left blank for local fallback until customized
                 authDomain: "square-expense-realtime.firebaseapp.com",
                 projectId: "square-expense-realtime",
                 storageBucket: "square-expense-realtime.appspot.com",
@@ -394,10 +394,10 @@
         let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
         let user = null; // Firebase user
         
-        // Define clean connection timeout (If database doesn't respond in 2.5 seconds, we skip directly to local offline mode!)
+        // Define connection timeout fallback (If database doesn't respond in 2.5 seconds, skip directly to offline mode!)
         const connectionTimeout = setTimeout(() => {
             if (!workspaceId) {
-                console.warn("Cloud connection handshake timed out. Activating Local Secure Mode.");
+                console.warn("Cloud connection timed out. Activating Local Secure Mode.");
                 activateOfflineFallback();
             }
         }, 2500);
@@ -406,16 +406,16 @@
             isLocalFallback = true;
             clearTimeout(connectionTimeout);
             
-            // Hide loading indicator, show auth screen immediately so they are not stuck!
+            // Hide loading indicator, show auth screen immediately
             document.getElementById('loading-screen').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             
             const badge = document.getElementById('db-status-badge');
             badge.textContent = "Offline Secure Mode Active (Local Storage Enabled)";
-            badge.className = "bg-brand-orange/20 p-3 border border-brand-orange text-[11px] font-bold uppercase text-brand-orange tracking-wider text-center";
+            badge.className = "bg-yellow-50 p-3 border-2 border-black text-[11px] font-bold uppercase text-black tracking-wider text-center";
             
             document.getElementById('workspace-mode-label').textContent = "LOCAL OFFLINE";
-            document.getElementById('workspace-mode-label').className = "bg-brand-orange text-black px-2 py-0.5 font-black text-[10px]";
+            document.getElementById('workspace-mode-label').className = "bg-brand-orange text-white px-2 py-0.5 font-black text-[10px]";
         }
 
         // Initialize Firebase safely
@@ -426,7 +426,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // Establish connection listen
+                // Establish connection listener
                 onAuthStateChanged(auth, (firebaseUser) => {
                     user = firebaseUser;
                     clearTimeout(connectionTimeout);
@@ -435,7 +435,7 @@
                         document.getElementById('login-screen').classList.remove('hidden');
                         const badge = document.getElementById('db-status-badge');
                         badge.textContent = "Cloud Handshake Verified. Real-time Synced Database Active.";
-                        badge.className = "bg-brand-green/20 p-3 border border-brand-green text-[11px] font-bold uppercase text-brand-green tracking-wider text-center";
+                        badge.className = "bg-green-50 p-3 border-2 border-black text-[11px] font-bold uppercase text-black tracking-wider text-center";
                         document.getElementById('workspace-mode-label').textContent = "SECURE CLOUD";
                         document.getElementById('workspace-mode-label').className = "bg-brand-green text-black px-2 py-0.5 font-black text-[10px]";
                     }
@@ -467,13 +467,13 @@
 
             if (mode === 'login') {
                 tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black border-r-4 border-black transition-all";
-                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white transition-all";
+                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black transition-all";
                 title.textContent = "SQUARE_SECURE";
                 subtitle.textContent = "Access Your Real-Time Database";
                 btn.textContent = "Unlock Real-time Workspace";
             } else {
-                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-zinc-900 text-zinc-500 hover:text-white border-r-4 border-black transition-all";
-                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-green text-black transition-all";
+                tabLogin.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-gray-100 text-gray-500 hover:text-black border-r-4 border-black transition-all";
+                tabReg.className = "flex-1 py-4 text-center text-xs font-black uppercase tracking-wider bg-brand-yellow text-black transition-all";
                 title.textContent = "REGISTER_WORKSPACE";
                 subtitle.textContent = "Setup a brand new ledger profile";
                 btn.textContent = "Create Workspace Profile";
@@ -655,11 +655,11 @@
             balanceEl.textContent = formatCurrency(remainAmount);
 
             if (remainAmount < 0) {
-                balanceContainer.className = "bg-black p-4 border-2 border-brand-pink shadow-flat-sm";
+                balanceContainer.className = "bg-red-50 p-4 border-2 border-brand-pink shadow-flat-sm";
                 balanceEl.className = "text-xl font-black text-brand-pink animate-pulse";
             } else {
-                balanceContainer.className = "bg-black p-4 border-2 border-brand-blue shadow-flat-sm";
-                balanceEl.className = "text-xl font-black text-brand-blue";
+                balanceContainer.className = "bg-white p-4 border-2 border-black shadow-flat-sm";
+                balanceEl.className = "text-xl font-black text-black";
             }
 
             document.getElementById('stat-count').textContent = expenses.length;
@@ -673,15 +673,15 @@
             progressBar.style.width = `${usagePercent}%`;
 
             if (totalSpent > salary) {
-                progressBar.classList.remove('bg-brand-blue');
+                progressBar.classList.remove('bg-brand-yellow');
                 progressBar.classList.add('bg-brand-pink');
                 document.getElementById('budget-percent').classList.add('text-brand-pink');
-                document.getElementById('budget-percent').classList.remove('text-zinc-400');
+                document.getElementById('budget-percent').classList.remove('text-gray-700');
             } else {
                 progressBar.classList.remove('bg-brand-pink');
-                progressBar.classList.add('bg-brand-blue');
+                progressBar.classList.add('bg-brand-yellow');
                 document.getElementById('budget-percent').classList.remove('text-brand-pink');
-                document.getElementById('budget-percent').classList.add('text-zinc-400');
+                document.getElementById('budget-percent').classList.add('text-gray-700');
             }
 
             renderCategoryBars(totalSpent);
@@ -780,7 +780,7 @@
 
             if (filtered.length === 0) {
                 listEl.innerHTML = `
-                    <div class="p-8 text-center uppercase text-xs font-bold text-zinc-600 tracking-wider">
+                    <div class="p-8 text-center uppercase text-xs font-bold text-gray-500 tracking-wider">
                         No transactions found matching workspace filters.
                     </div>
                 `;
@@ -797,21 +797,21 @@
                 });
 
                 const ledgerRow = `
-                    <div class="p-4 hover:bg-zinc-950 transition-colors flex justify-between items-center gap-4 group">
+                    <div class="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center gap-4 group">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-2.5 h-10 shrink-0 ${colorSet.bg} border border-black"></div>
                             <div class="min-w-0">
-                                <h4 class="text-sm font-bold uppercase truncate text-white group-hover:text-brand-yellow transition-colors">${item.title}</h4>
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 font-bold uppercase mt-0.5">
+                                <h4 class="text-sm font-bold uppercase truncate text-black group-hover:text-brand-orange transition-colors">${item.title}</h4>
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 font-bold uppercase mt-0.5">
                                     <span>${formattedDate}</span>
                                     <span>•</span>
-                                    <span class="text-zinc-400">${item.category}</span>
+                                    <span class="text-gray-600">${item.category}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-3 shrink-0">
-                            <span class="text-base font-extrabold text-white font-mono">${formatCurrency(item.amount)}</span>
+                            <span class="text-base font-extrabold text-black font-mono">${formatCurrency(item.amount)}</span>
                             <button onclick="deleteExpense('${item.id}')" aria-label="Delete entry"
                                     class="bg-brand-pink text-black p-2 hover:bg-red-500 border-2 border-black active:translate-y-[1px] transition-all flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -831,7 +831,7 @@
             container.innerHTML = '';
 
             if (expenses.length === 0) {
-                container.innerHTML = `<div class="text-zinc-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>`;
+                container.innerHTML = `<div class="text-gray-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>`;
                 return;
             }
 
@@ -849,15 +849,15 @@
                     const colorSet = categoryColors[cat] || { bg: 'bg-zinc-500' };
 
                     const itemHtml = `
-                        <div class="bg-black p-3 border-2 border-zinc-800 flex flex-col gap-1.5 hover:border-white transition-all">
+                        <div class="bg-white p-3 border-2 border-black flex flex-col gap-1.5 hover:border-brand-yellow transition-all">
                             <div class="flex justify-between items-baseline text-xs font-bold uppercase">
                                 <span class="flex items-center gap-2">
                                     <span class="w-3.5 h-3.5 block ${colorSet.bg} border border-black"></span>
                                     <span>${cat}</span>
                                 </span>
-                                <span>${formatCurrency(amt)} <span class="text-zinc-500 text-[10px]">(${pct}%)</span></span>
+                                <span>${formatCurrency(amt)} <span class="text-gray-500 text-[10px]">(${pct}%)</span></span>
                             </div>
-                            <div class="w-full bg-zinc-900 h-4 border-2 border-black p-0.5">
+                            <div class="w-full bg-gray-100 h-4 border-2 border-black p-0.5">
                                 <div class="h-full ${colorSet.bg} transition-all duration-300" style="width: ${pct}%"></div>
                             </div>
                         </div>
@@ -867,6 +867,15 @@
         }
 
         // Populating Sample Demo Data
+        const demoData = [
+            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
+            { title: "Monthly Fuel Refill", amount: 4500, category: "Transport & Auto", date: getOffsetDate(-2) },
+            { title: "Concert Access & Cinema Passes", amount: 3500, category: "Entertainment", date: getOffsetDate(-4) },
+            { title: "Home Broadband & Utility Bills", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
+            { title: "Tactile Keyboard Upgrade", amount: 9500, category: "Shopping & Custom", date: getOffsetDate(-8) },
+            { title: "Premium Roast Coffee Beans", amount: 1200, category: "Food & Dining", date: getOffsetDate(-10) }
+        ];
+
         document.getElementById('btn-demo').addEventListener('click', () => {
             if (!workspaceId) return;
             showConfirm("This will write mock demo transactions into your current Workspace. Proceed?", async () => {
@@ -957,10 +966,10 @@
 
             text.textContent = message;
             indicator.className = "w-4 h-4 border border-black";
-            if (type === "green") indicator.classList.add("bg-brand-green");
-            if (type === "pink") indicator.classList.add("bg-brand-pink");
-            if (type === "blue") indicator.classList.add("bg-brand-blue");
-            if (type === "yellow") indicator.classList.add("bg-brand-yellow");
+            if (type === "green") indicator.className += " bg-brand-green";
+            if (type === "pink") indicator.className += " bg-brand-pink";
+            if (type === "blue") indicator.className += " bg-brand-blue";
+            if (type === "yellow") indicator.className += " bg-brand-yellow";
 
             toast.classList.remove('hidden');
             setTimeout(() => {
