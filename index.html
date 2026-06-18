@@ -286,6 +286,14 @@
         </div>
     </div>
 
+    <!-- TOAST POPUP NOTIFICATION -->
+    <div id="toast-notification" class="fixed bottom-4 right-4 bg-darkCard text-white p-4 rounded-2xl border border-zinc-800 shadow-premium hidden z-50 transition-all duration-300">
+        <div class="flex items-center gap-3">
+            <div id="toast-indicator" class="w-3 h-3 rounded-full bg-brandGreen"></div>
+            <p id="toast-text" class="text-xs font-bold uppercase tracking-wider text-zinc-200"></p>
+        </div>
+    </div>
+
     <!-- Firebase Real-Time Synchronization Scripts -->
     <script type="module">
         // Import Firebase ES Modules safely
@@ -614,6 +622,26 @@
             renderLedgerList(filteredExpenses);
         }
 
+        // polarToCartesian for drawing segments
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+            const angleInRadians = (angleInDegrees) * Math.PI / 180.0;
+            return {
+                x: centerX + (radius * Math.cos(angleInRadians)),
+                y: centerY + (radius * Math.sin(angleInRadians))
+            };
+        }
+
+        // Arc path descriptor
+        function describeArc(x, y, radius, startAngle, endAngle) {
+            const start = polarToCartesian(x, y, radius, endAngle);
+            const end = polarToCartesian(x, y, radius, startAngle);
+            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+            return [
+                "M", start.x, start.y, 
+                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+            ].join(" ");
+        }
+
         // Generates clean segmented circular sections on SVG directly
         function drawDoughnutChart(filteredExpenses, totalSpent) {
             const chartSvg = document.getElementById('doughnut-chart-svg');
@@ -646,39 +674,52 @@
                 }
             });
 
-            // Radius parameters matching style: cx=60, cy=60, r=46
-            const radius = 46;
-            const circumference = 2 * Math.PI * radius; // Approx 289.026
+            // Sort largest to smallest for beautiful visual layering
+            segments.sort((a, b) => b.sum - a.sum);
 
-            let currentOffset = 0;
-            // Introduce a subtle spacing gap between segments if there are multiple segments
-            const spacingGap = segments.length > 1 ? 1.5 : 0; 
-            const totalGapsOffset = spacingGap * segments.length;
+            let currentAngle = 0; // Starts from 12 o'clock (via transform rotate-90 inside SVG)
+            const gapDegrees = segments.length > 1 ? 6 : 0; // Space gap between segments
+            const totalGaps = gapDegrees * segments.length;
+            const remainingDegrees = 360 - totalGaps;
 
             segments.forEach((segment) => {
                 const colors = categoryColors[segment.category];
+                const sweepAngle = (segment.percentage / 100) * remainingDegrees;
                 
-                // Segment length with gaps factored out
-                const adjustedPercentage = segment.percentage - (spacingGap / segments.length);
-                const strokeLength = (adjustedPercentage / 100) * circumference;
-                const remainingSpace = circumference - strokeLength;
+                const startAngle = currentAngle + (gapDegrees / 2);
+                const endAngle = startAngle + sweepAngle;
 
-                // Create dynamic circle path representation
-                const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circleNode.setAttribute("cx", "60");
-                circleNode.setAttribute("cy", "60");
-                circleNode.setAttribute("r", radius.toString());
-                circleNode.setAttribute("fill", "none");
-                circleNode.setAttribute("stroke", colors.fill);
-                circleNode.setAttribute("stroke-width", "12");
-                circleNode.setAttribute("stroke-dasharray", `${strokeLength} ${remainingSpace}`);
-                circleNode.setAttribute("stroke-dashoffset", (-currentOffset).toString());
-                circleNode.setAttribute("class", "chart-segment");
+                // Create SVG path
+                const pathData = describeArc(60, 60, 46, startAngle, endAngle);
                 
-                chartSvg.appendChild(circleNode);
+                const pathNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathNode.setAttribute("d", pathData);
+                pathNode.setAttribute("fill", "none");
+                pathNode.setAttribute("stroke", colors.fill);
+                pathNode.setAttribute("stroke-width", "11");
+                pathNode.setAttribute("stroke-linecap", "round");
+                pathNode.setAttribute("class", "chart-segment cursor-pointer transition-all duration-300 hover:stroke-[13]");
+                chartSvg.appendChild(pathNode);
 
-                // Accumulate progress
-                currentOffset += strokeLength + (spacingGap / 100 * circumference);
+                // Place text precisely inside the segment at midpoint
+                const midAngle = startAngle + (sweepAngle / 2);
+                const textPos = polarToCartesian(60, 60, 46, midAngle);
+                
+                // Only render text if the segment sweep is wide enough to hold it gracefully
+                if (segment.percentage >= 6) {
+                    const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    textNode.setAttribute("x", textPos.x.toString());
+                    textNode.setAttribute("y", (textPos.y + 1).toString()); // slight offset for alignment
+                    textNode.setAttribute("fill", "#121214");
+                    textNode.setAttribute("font-size", "5.5");
+                    textNode.setAttribute("font-weight", "800");
+                    textNode.setAttribute("text-anchor", "middle");
+                    textNode.setAttribute("dominant-baseline", "middle");
+                    textNode.textContent = `${Math.round(segment.percentage)}%`;
+                    chartSvg.appendChild(textNode);
+                }
+
+                currentAngle = endAngle + (gapDegrees / 2);
 
                 // Render matching label entry beneath chart
                 const pillHtml = `
@@ -837,7 +878,7 @@
         };
 
         // POPULATE DEMO DATA SETUP
-        document.getElementById('btn-demo').addEventListener('click', () => {
+        window.loadDemoData = () => {
             if (!workspaceId) return;
             showConfirm("Populate mock sample logs in your workspace?", async () => {
                 if (isLocalFallback) {
@@ -863,10 +904,10 @@
                     showNotification("Cloud Workspace database populated", "green");
                 }
             });
-        });
+        };
 
         // Wipes all log parameters out
-        document.getElementById('btn-clear').addEventListener('click', () => {
+        window.clearAllExpenses = () => {
             if (!workspaceId) return;
             showConfirm("Wipe entire logs history in your database profile?", async () => {
                 if (isLocalFallback) {
@@ -883,7 +924,7 @@
                     showNotification("Cloud database wiped successfully.", "pink");
                 }
             });
-        });
+        };
 
         // Helper to map demo logs inside currently targeted month
         function getOffsetDateForMonth(daysOffset) {
@@ -976,7 +1017,7 @@
             const text = document.getElementById('toast-text');
 
             text.textContent = message;
-            indicator.className = "w-4 h-4 border border-black";
+            indicator.className = "w-3 h-3 rounded-full";
             if (type === "green") indicator.classList.add("bg-brandGreen");
             if (type === "pink") indicator.classList.add("bg-brandPink");
             if (type === "blue") indicator.classList.add("bg-brandBlue");
