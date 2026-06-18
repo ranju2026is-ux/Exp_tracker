@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQUARE - Personal Expense Tracker</title>
+    <title>SQUARE - Realtime Expense Tracker</title>
     <!-- Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,6 +28,7 @@
                         'flat-lg': '8px 8px 0px 0px #000000',
                         'flat-yellow': '4px 4px 0px 0px #FFE600',
                         'flat-blue': '4px 4px 0px 0px #00F0FF',
+                        'flat-green': '4px 4px 0px 0px #39FF14',
                     }
                 }
             }
@@ -64,97 +65,207 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-8">
+<body class="min-h-screen flex flex-col p-4 md:p-8 justify-center items-center">
 
-    <!-- Header Section -->
-    <header class="max-w-6xl w-full mx-auto mb-6">
-        <div class="bg-brand-yellow text-brand-dark p-6 border-4 border-black shadow-flat-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
-                <p class="text-xs sm:text-sm font-medium uppercase mt-1 tracking-wider">No curves. No distractions. Just pure finance tracking.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <button onclick="loadDemoData()" class="bg-black hover:bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
-                    Demo Data
-                </button>
-                <button onclick="clearAllExpenses()" class="bg-brand-pink hover:bg-pink-600 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
-                    Clear Data
-                </button>
-            </div>
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="w-full max-w-md bg-brand-card p-8 border-4 border-black shadow-flat-lg flex flex-col items-center gap-4 text-center">
+        <div class="animate-spin w-10 h-10 border-4 border-brand-yellow border-t-transparent"></div>
+        <p class="text-sm font-bold uppercase text-brand-yellow tracking-widest mt-2">Securing Cloud Handshake...</p>
+    </div>
+
+    <!-- LOGIN SCREEN (Initially Hidden) -->
+    <div id="login-screen" class="hidden w-full max-w-md bg-brand-card p-8 border-4 border-black shadow-flat-lg flex flex-col gap-6">
+        <div class="text-center">
+            <h1 class="text-3xl font-black text-brand-yellow tracking-tight uppercase">SQUARE_SECURE</h1>
+            <p class="text-xs font-bold text-zinc-400 mt-1 uppercase tracking-wider">Access Real-Time Database Workspace</p>
         </div>
-    </header>
 
-    <!-- Main Content Grid -->
-    <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
-        
-        <!-- Left Column: Add Expense Form & Stats (5 Cols on Large) -->
-        <section class="lg:col-span-5 flex flex-col gap-6">
-            
-            <!-- Quick Stats Board -->
-            <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-yellow">Overview Dashboard</h2>
-                
-                <!-- Large Total Box -->
-                <div class="bg-black p-4 border-2 border-brand-yellow shadow-flat-yellow">
-                    <span class="text-xs font-bold uppercase text-zinc-400 block mb-1">Total Accumulated Expenses</span>
-                    <span id="total-amount" class="text-3xl sm:text-4xl font-black text-brand-yellow">$0.00</span>
-                </div>
-
-                <!-- Budget Status Box -->
-                <div class="bg-black p-4 border-2 border-brand-blue shadow-flat-blue flex flex-col gap-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase text-zinc-400">Monthly Budget Target</span>
-                        <button onclick="promptBudget()" class="text-xs text-brand-blue hover:underline uppercase font-bold">Edit</button>
-                    </div>
-                    <div class="flex justify-between items-baseline">
-                        <span id="budget-value" class="text-xl font-bold text-brand-blue">$1,000.00</span>
-                        <span id="budget-percent" class="text-xs font-medium text-zinc-400">0% Used</span>
-                    </div>
-                    <!-- Square Progress Bar -->
-                    <div class="w-full bg-zinc-800 h-6 border-2 border-black p-0.5">
-                        <div id="budget-progress-bar" class="h-full bg-brand-blue transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <!-- Secondary KPI Squares -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-zinc-900 p-3 border-2 border-black">
-                        <span class="text-[10px] font-bold uppercase text-zinc-400 block">Total Entries</span>
-                        <span id="stat-count" class="text-xl font-bold text-white">0</span>
-                    </div>
-                    <div class="bg-zinc-900 p-3 border-2 border-black">
-                        <span class="text-[10px] font-bold uppercase text-zinc-400 block">Avg. Expense</span>
-                        <span id="stat-average" class="text-xl font-bold text-white">$0.00</span>
-                    </div>
-                </div>
+        <form id="login-form" class="flex flex-col gap-4">
+            <div>
+                <label for="login-username" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Username</label>
+                <input type="text" id="login-username" placeholder="Enter username (e.g., karnataka_user)" required
+                       class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm uppercase">
             </div>
 
-            <!-- Add Expense Square Card -->
-            <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
-                <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-green">New Transaction</h2>
+            <div>
+                <label for="login-password" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" required
+                       class="w-full bg-black text-white placeholder-zinc-600 font-medium p-3 border-2 border-zinc-700 focus:border-brand-yellow focus:outline-none text-sm">
+            </div>
+
+            <div class="bg-black/40 p-3 border border-zinc-800 text-[11px] font-bold uppercase text-zinc-500 tracking-wider text-center">
+                Note: Sign in is securely synchronized to persistent storage.
+            </div>
+
+            <button type="submit" class="w-full bg-brand-yellow hover:bg-yellow-400 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
+                Unlock Real-time Workspace
+            </button>
+        </form>
+    </div>
+
+    <!-- MAIN APP SCREEN (Initially hidden, shown after successful login) -->
+    <div id="app-screen" class="hidden w-full max-w-6xl mx-auto flex flex-col gap-6">
+        
+        <!-- Header Section -->
+        <header class="w-full">
+            <div class="bg-brand-yellow text-brand-dark p-6 border-4 border-black shadow-flat-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight">SQUARE_EXPENSE</h1>
+                    <p class="text-xs sm:text-sm font-bold uppercase mt-1 tracking-wider">
+                        Welcome, <span id="user-display" class="underline text-black font-black">User</span>! Active INR Cloud Workspace
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button id="btn-demo" class="bg-black hover:bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
+                        Populate Sample Data
+                    </button>
+                    <button id="btn-clear" class="bg-brand-pink hover:bg-pink-600 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
+                        Clear All Data
+                    </button>
+                    <button id="btn-logout" class="bg-white hover:bg-zinc-200 text-black font-bold py-2 px-4 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-xs uppercase tracking-wider">
+                        Lock Workspace
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow w-full">
+            
+            <!-- Left Column: Add Expense Form & Stats (5 Cols on Large) -->
+            <section class="lg:col-span-5 flex flex-col gap-6">
                 
-                <form id="expense-form" class="flex flex-col gap-4" onsubmit="handleFormSubmit(event)">
-                    <!-- Item Title -->
-                    <div>
-                        <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Expense Title / Description</label>
-                        <input type="text" id="item-title" placeholder="e.g., Grocery shopping, Gas, Coffee" required
-                               class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                <!-- Quick Stats Board -->
+                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-yellow">Overview Dashboard</h2>
+                    
+                    <!-- Salary Details Widget -->
+                    <div class="bg-black p-4 border-2 border-brand-green shadow-flat-green flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-0.5">Total Monthly Salary</span>
+                            <span id="salary-display" class="text-2xl font-black text-brand-green">₹0</span>
+                        </div>
+                        <button id="btn-update-salary" class="bg-brand-green text-black text-xs font-extrabold py-1.5 px-3 border border-black hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm uppercase tracking-wider">
+                            Update
+                        </button>
                     </div>
 
-                    <!-- Row with Amount and Category -->
+                    <!-- Side-by-side: Expenses vs Money Left -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Amount -->
-                        <div>
-                            <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Amount ($)</label>
-                            <input type="number" id="item-amount" min="0.01" step="0.01" placeholder="0.00" required
-                                   class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm">
+                        <!-- Total Expenses Box -->
+                        <div class="bg-black p-4 border-2 border-brand-pink shadow-flat-sm">
+                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-1">Spent Money</span>
+                            <span id="total-amount" class="text-xl font-black text-brand-pink">₹0</span>
                         </div>
 
-                        <!-- Category Selection -->
+                        <!-- Remaining Balance Box -->
+                        <div id="balance-container" class="bg-black p-4 border-2 border-brand-blue shadow-flat-sm">
+                            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-1">Remain Amount</span>
+                            <span id="remaining-balance" class="text-xl font-black text-brand-blue">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Budget / Salary Usage Box -->
+                    <div class="bg-black p-4 border-2 border-brand-blue flex flex-col gap-2">
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-xs font-bold uppercase text-zinc-400">Salary Utilized</span>
+                            <span id="budget-percent" class="text-xs font-black text-zinc-400">0% Used</span>
+                        </div>
+                        <!-- Square Progress Bar -->
+                        <div class="w-full bg-zinc-800 h-6 border-2 border-black p-0.5">
+                            <div id="budget-progress-bar" class="h-full bg-brand-blue transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary KPI Squares -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-zinc-900 p-3 border-2 border-black">
+                            <span class="text-[10px] font-bold uppercase text-zinc-400 block">Total Entries</span>
+                            <span id="stat-count" class="text-xl font-bold text-white">0</span>
+                        </div>
+                        <div class="bg-zinc-900 p-3 border-2 border-black">
+                            <span class="text-[10px] font-bold uppercase text-zinc-400 block">Avg. Expense</span>
+                            <span id="stat-average" class="text-xl font-bold text-white">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Expense Square Card -->
+                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex flex-col gap-4">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-green">New Transaction</h2>
+                    
+                    <form id="expense-form" class="flex flex-col gap-4">
+                        <!-- Item Title -->
                         <div>
-                            <label for="item-category" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Category</label>
-                            <select id="item-category" required
-                                    class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                            <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Expense Title / Description</label>
+                            <input type="text" id="item-title" placeholder="e.g., Grocery shopping, Gas, Chai & Snacks" required
+                                   class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                        </div>
+
+                        <!-- Row with Amount and Category -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Amount -->
+                            <div>
+                                <label for="item-amount" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Amount (₹)</label>
+                                <input type="number" id="item-amount" min="1" step="1" placeholder="0" required
+                                       class="w-full bg-black text-white placeholder-zinc-500 font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm">
+                            </div>
+
+                            <!-- Category Selection -->
+                            <div>
+                                <label for="item-category" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Category</label>
+                                <select id="item-category" required
+                                        class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                                    <option value="Food & Dining">Food & Dining</option>
+                                    <option value="Transport & Auto">Transport</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Utilities & Bills">Utilities</option>
+                                    <option value="Shopping & Custom">Shopping</option>
+                                    <option value="Miscellaneous">Misc</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Date Selection -->
+                        <div>
+                            <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Transaction Date</label>
+                            <input type="date" id="item-date" required
+                                   class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-brand-green hover:bg-emerald-500 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
+                            Add Expense Entry
+                        </button>
+                    </form>
+                </div>
+
+            </section>
+
+            <!-- Right Column: Ledger & Category Distribution (7 Cols on Large) -->
+            <section class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Category Distribution Visualizer -->
+                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md">
+                    <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-purple mb-4">Category Allocations</h2>
+                    
+                    <!-- Square visual bar stack -->
+                    <div id="category-distribution-container" class="flex flex-col gap-3">
+                        <!-- Dynamic blocks will render here -->
+                        <div class="text-zinc-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>
+                    </div>
+                </div>
+
+                <!-- Ledger/History Box -->
+                <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex-grow flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-black pb-4 mb-4">
+                        <h2 class="text-lg font-bold uppercase text-brand-orange">Ledger Entries</h2>
+                        
+                        <!-- Sorting & Search Control Grid -->
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <select id="filter-category"
+                                    class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
+                                <option value="ALL">All Categories</option>
                                 <option value="Food & Dining">Food & Dining</option>
                                 <option value="Transport & Auto">Transport</option>
                                 <option value="Entertainment">Entertainment</option>
@@ -162,92 +273,49 @@
                                 <option value="Shopping & Custom">Shopping</option>
                                 <option value="Miscellaneous">Misc</option>
                             </select>
+
+                            <select id="sort-order"
+                                    class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
+                                <option value="date-desc">Newest First</option>
+                                <option value="date-asc">Oldest First</option>
+                                <option value="amount-desc">Highest Amount</option>
+                                <option value="amount-asc">Lowest Amount</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Date Selection -->
-                    <div>
-                        <label for="item-date" class="block text-xs font-bold uppercase mb-2 text-zinc-300">Transaction Date</label>
-                        <input type="date" id="item-date" required
-                               class="w-full bg-black text-white font-medium p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none transition-colors text-sm uppercase">
+                    <!-- Ledger Search Bar -->
+                    <div class="mb-4">
+                        <input type="text" id="search-ledger" placeholder="Filter ledger by title/keyword..." 
+                               class="w-full bg-black text-white placeholder-zinc-600 text-xs font-bold p-3 border-2 border-zinc-800 focus:border-brand-orange focus:outline-none uppercase">
                     </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="w-full bg-brand-green hover:bg-emerald-500 text-black font-extrabold py-3 px-6 border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 transition-all shadow-flat-sm text-sm uppercase tracking-wider mt-2">
-                        Add Expense Entry
-                    </button>
-                </form>
-            </div>
-
-        </section>
-
-        <!-- Right Column: Ledger & Category Distribution (7 Cols on Large) -->
-        <section class="lg:col-span-7 flex flex-col gap-6">
-            
-            <!-- Category Distribution Visualizer -->
-            <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md">
-                <h2 class="text-lg font-bold uppercase border-b-2 border-black pb-2 text-brand-purple mb-4">Category Allocations</h2>
-                
-                <!-- Square visual bar stack -->
-                <div id="category-distribution-container" class="flex flex-col gap-3">
-                    <!-- Dynamic blocks will render here -->
-                    <div class="text-zinc-500 text-sm uppercase text-center py-4">No allocations to show. Add expenses first!</div>
-                </div>
-            </div>
-
-            <!-- Ledger/History Box -->
-            <div class="bg-brand-card p-6 border-4 border-black shadow-flat-md flex-grow flex flex-col">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-black pb-4 mb-4">
-                    <h2 class="text-lg font-bold uppercase text-brand-orange">Ledger Entries</h2>
+                    <!-- Table/List Area -->
+                    <div class="flex-grow overflow-y-auto max-h-[400px] border-2 border-black bg-black">
+                        <div id="ledger-list" class="divide-y-2 divide-black">
+                            <!-- Dynamic expense items will render here -->
+                        </div>
+                    </div>
                     
-                    <!-- Sorting & Search Control Grid -->
-                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <select id="filter-category" onchange="renderExpenses()"
-                                class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
-                            <option value="ALL">All Categories</option>
-                            <option value="Food & Dining">Food & Dining</option>
-                            <option value="Transport & Auto">Transport</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Utilities & Bills">Utilities</option>
-                            <option value="Shopping & Custom">Shopping</option>
-                            <option value="Miscellaneous">Misc</option>
-                        </select>
-
-                        <select id="sort-order" onchange="renderExpenses()"
-                                class="bg-black text-white text-xs font-bold p-2 border-2 border-zinc-700 focus:border-brand-orange focus:outline-none uppercase w-full sm:w-auto">
-                            <option value="date-desc">Newest First</option>
-                            <option value="date-asc">Oldest First</option>
-                            <option value="amount-desc">Highest Amount</option>
-                            <option value="amount-asc">Lowest Amount</option>
-                        </select>
+                    <!-- Bottom Status -->
+                    <div class="mt-4 flex justify-between items-center text-xs font-bold uppercase text-zinc-500">
+                        <span id="filtered-count">Showing 0 / 0 entries</span>
+                        <button id="btn-export" class="text-brand-orange hover:underline text-xs uppercase font-extrabold">Export as CSV File</button>
                     </div>
                 </div>
 
-                <!-- Ledger Search Bar -->
-                <div class="mb-4">
-                    <input type="text" id="search-ledger" oninput="renderExpenses()" placeholder="Filter ledger by title/keyword..." 
-                           class="w-full bg-black text-white placeholder-zinc-600 text-xs font-bold p-3 border-2 border-zinc-800 focus:border-brand-orange focus:outline-none uppercase">
-                </div>
+            </section>
 
-                <!-- Table/List Area -->
-                <div class="flex-grow overflow-y-auto max-h-[400px] border-2 border-black bg-black">
-                    <div id="ledger-list" class="divide-y-2 divide-black">
-                        <!-- Dynamic expense items will render here -->
-                    </div>
-                </div>
-                
-                <!-- Bottom Status -->
-                <div class="mt-4 flex justify-between items-center text-xs font-bold uppercase text-zinc-500">
-                    <span id="filtered-count">Showing 0 / 0 entries</span>
-                    <button onclick="downloadCSV()" class="text-brand-orange hover:underline">Export as CSV File</button>
-                </div>
-            </div>
+        </main>
 
-        </section>
+        <!-- Footer Area -->
+        <footer class="w-full mt-8 border-t-4 border-black pt-4 text-center text-xs font-bold uppercase text-zinc-600 tracking-widest flex flex-col sm:flex-row justify-between gap-2">
+            <span>SQUARE_EXPENSE © 2026</span>
+            <span>Premium Structural Real-Time Dashboard</span>
+        </footer>
+    </div>
 
-    </main>
-
-    <!-- Interactive Alert / Toast Notification box (No window.alert used) -->
+    <!-- Interactive Alert / Toast Notification box -->
     <div id="toast-notification" class="fixed bottom-4 right-4 bg-black text-white p-4 border-4 border-black shadow-flat-sm hidden z-50 transition-all duration-300">
         <div class="flex items-center gap-3">
             <div id="toast-indicator" class="w-4 h-4 bg-brand-green border border-black"></div>
@@ -255,18 +323,18 @@
         </div>
     </div>
 
-    <!-- Modal for editing/updating budget -->
-    <div id="budget-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
+    <!-- Modal for editing/updating monthly salary -->
+    <div id="salary-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-brand-card p-6 border-4 border-black max-w-sm w-full shadow-flat-lg">
-            <h3 class="text-xl font-bold uppercase text-brand-blue border-b-2 border-black pb-2 mb-4">Set Monthly Budget</h3>
+            <h3 class="text-xl font-bold uppercase text-brand-green border-b-2 border-black pb-2 mb-4">Set Monthly Salary</h3>
             <div class="flex flex-col gap-4">
                 <div>
-                    <label for="new-budget-input" class="block text-xs font-bold uppercase text-zinc-400 mb-2">Budget Target ($)</label>
-                    <input type="number" id="new-budget-input" min="1" placeholder="1000.00" class="w-full bg-black text-white p-3 border-2 border-zinc-700 focus:border-brand-blue focus:outline-none text-sm">
+                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-zinc-400 mb-2">Income Target (₹)</label>
+                    <input type="number" id="new-salary-input" min="1" placeholder="50000" class="w-full bg-black text-white p-3 border-2 border-zinc-700 focus:border-brand-green focus:outline-none text-sm">
                 </div>
                 <div class="flex justify-end gap-2 mt-2">
-                    <button onclick="closeBudgetModal()" class="bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black text-xs uppercase">Cancel</button>
-                    <button onclick="saveBudget()" class="bg-brand-blue text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Save Limit</button>
+                    <button id="btn-close-salary-modal" class="bg-zinc-800 text-white font-bold py-2 px-4 border-2 border-black text-xs uppercase">Cancel</button>
+                    <button id="btn-save-salary" class="bg-brand-green text-black font-extrabold py-2 px-4 border-2 border-black text-xs uppercase shadow-flat-sm">Save income</button>
                 </div>
             </div>
         </div>
@@ -284,19 +352,37 @@
         </div>
     </div>
 
-    <!-- Footer Area -->
-    <footer class="max-w-6xl w-full mx-auto mt-8 border-t-4 border-black pt-4 text-center text-xs font-bold uppercase text-zinc-600 tracking-widest flex flex-col sm:flex-row justify-between gap-2">
-        <span>SQUARE_EXPENSE © 2026</span>
-        <span>Premium Structural Neo-Brutalist Dashboard Tool</span>
-    </footer>
+    <!-- Firebase Real-Time Synchronization Scripts -->
+    <script type="module">
+        // Import Firebase ES Modules safely
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <!-- JS Logic Core -->
-    <script>
-        // In-memory state
+        // Global variables provided by environment (or local fallbacks)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'square-expense-realtime';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "",
+                authDomain: "square-expense-realtime.firebaseapp.com",
+                projectId: "square-expense-realtime",
+                storageBucket: "square-expense-realtime.appspot.com",
+                messagingSenderId: "1234567890",
+                appId: "1:1234:web:abcd"
+            };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // App State
         let expenses = [];
-        let budget = 1200.00;
+        let salary = 75000; // Default Salary
+        let user = null;
+        let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
 
-        // Colors assigned to categories for modern neo-brutalist progress bars
         const categoryColors = {
             'Food & Dining': { bg: 'bg-brand-yellow', border: 'border-brand-yellow', hex: '#FFE600' },
             'Transport & Auto': { bg: 'bg-brand-blue', border: 'border-brand-blue', hex: '#00F0FF' },
@@ -306,168 +392,194 @@
             'Miscellaneous': { bg: 'bg-brand-orange', border: 'border-brand-orange', hex: '#FF5C00' }
         };
 
-        // Standard Demo Data to populate on first load or button click
-        const demoData = [
-            { id: "demo-1", title: "Organic Grocery Store Run", amount: 142.50, category: "Food & Dining", date: getOffsetDate(-1) },
-            { id: "demo-2", title: "Downtown Fuel Refill", amount: 48.00, category: "Transport & Auto", date: getOffsetDate(-2) },
-            { id: "demo-3", title: "Streaming & Concert Access Pass", amount: 89.99, category: "Entertainment", date: getOffsetDate(-4) },
-            { id: "demo-4", title: "Fiber Optic Home Internet Bill", amount: 110.00, category: "Utilities & Bills", date: getOffsetDate(-5) },
-            { id: "demo-5", title: "Tactile Mechanical Keyboard Upgrade", amount: 180.00, category: "Shopping & Custom", date: getOffsetDate(-8) },
-            { id: "demo-6", title: "Premium Dark Blend Artisan Coffee Beans", amount: 24.50, category: "Food & Dining", date: getOffsetDate(-10) }
-        ];
-
-        // Utility helper to construct ISO dates dynamically based on current date
+        // Helper to construct dates
         function getOffsetDate(daysOffset) {
             const date = new Date();
             date.setDate(date.getDate() + daysOffset);
             return date.toISOString().split('T')[0];
         }
 
-        // Initialize Application
-        window.addEventListener('DOMContentLoaded', () => {
-            // Set current date input default
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('item-date').value = today;
+        // Demo Data Template
+        const demoData = [
+            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
+            { title: "Monthly Fuel Refill", amount: 4500, category: "Transport & Auto", date: getOffsetDate(-2) },
+            { title: "Concert Access & Cinema Passes", amount: 3500, category: "Entertainment", date: getOffsetDate(-4) },
+            { title: "Home Broadband & Utility Bills", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
+            { title: "Tactile Keyboard Upgrade", amount: 9500, category: "Shopping & Custom", date: getOffsetDate(-8) },
+            { title: "Premium Roast Coffee Beans", amount: 1200, category: "Food & Dining", date: getOffsetDate(-10) }
+        ];
 
-            // Load original demo set to look professional right out of the box
-            expenses = [...demoData];
-            updateDashboard();
-            renderExpenses();
-            showNotification("Welcome! Square tracker loaded with sample ledger data.", "green");
+        // Custom Hashing function to construct a deterministic ID string from username + password
+        async function getDeterministicHash(username, password) {
+            const msgUint8 = new TextEncoder().encode(username.trim().toLowerCase() + "::" + password.trim());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
+        }
+
+        // 1. Authenticate with custom token priority or fallback anonymously
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication handshake error: ", error);
+                showNotification("Auth Failed. Running in Secure Sandbox Mode.", "pink");
+            }
+        };
+
+        // Initialize handshake right away
+        initAuth();
+
+        // Listen for Auth changes
+        onAuthStateChanged(auth, (firebaseUser) => {
+            user = firebaseUser;
+            // Hide loading indicator, show login screen if not already unlocked
+            document.getElementById('loading-screen').classList.add('hidden');
+            if (user) {
+                // Keep login screen visible until user fills in credentials
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
         });
 
-        // Trigger Notification
-        function showNotification(message, type = "green") {
-            const toast = document.getElementById('toast-notification');
-            const indicator = document.getElementById('toast-indicator');
-            const text = document.getElementById('toast-text');
+        // Form Submission to unlock the Workspace
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!user) {
+                showNotification("Waiting for secure cloud connection...", "pink");
+                return;
+            }
 
-            text.textContent = message;
+            const usernameVal = document.getElementById('login-username').value;
+            const passwordVal = document.getElementById('login-password').value;
 
-            // Reset indicators
-            indicator.className = "w-4 h-4 border border-black";
-            if (type === "green") indicator.classList.add("bg-brand-green");
-            if (type === "pink") indicator.classList.add("bg-brand-pink");
-            if (type === "blue") indicator.classList.add("bg-brand-blue");
-            if (type === "yellow") indicator.classList.add("bg-brand-yellow");
+            // Generate deterministic sub-workspace identifier using SHA-256
+            workspaceId = await getDeterministicHash(usernameVal, passwordVal);
 
-            // Pop toast out and in
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 4000);
-        }
+            // Toggle screens
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.body.classList.remove('justify-center', 'items-center');
 
-        // Custom Confirm Dialog wrapper
-        function showConfirm(message, onOk) {
-            const modal = document.getElementById('confirm-modal');
-            const msgEl = document.getElementById('confirm-message');
-            const cancelBtn = document.getElementById('confirm-cancel');
-            const okBtn = document.getElementById('confirm-ok');
+            document.getElementById('user-display').textContent = usernameVal.toUpperCase();
 
-            msgEl.textContent = message;
-            modal.classList.remove('hidden');
+            // Set current date selector
+            document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
 
-            const close = () => modal.classList.add('hidden');
+            // Setup Realtime Database synchronization
+            startRealtimeListeners();
+            showNotification(`Handshake verified. Secure session loaded: ${usernameVal.toUpperCase()}`, "green");
+        });
 
-            cancelBtn.onclick = () => { close(); };
-            okBtn.onclick = () => { close(); onOk(); };
-        }
+        // Sync Firestore Listeners
+        let unsubscribeSettings = null;
+        let unsubscribeExpenses = null;
 
-        // Add Demo Data
-        function loadDemoData() {
-            expenses = [...demoData];
-            updateDashboard();
-            renderExpenses();
-            showNotification("Demo Ledger loaded successfully", "yellow");
-        }
+        function startRealtimeListeners() {
+            if (!user) return;
 
-        // Completely Wipe Out Expenses
-        function clearAllExpenses() {
-            showConfirm("Are you completely sure you want to clear your current expense log?", () => {
+            // Define references based on strict structure rules
+            // RULE 1: /artifacts/{appId}/users/{userId}/{collectionName}/{docId}
+            const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
+            const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+
+            // 1. Sync User settings (e.g. Salary, Target settings)
+            unsubscribeSettings = onSnapshot(settingsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    salary = docSnap.data().salary || 75000;
+                } else {
+                    // Create default settings on the cloud immediately
+                    setDoc(settingsDocRef, { salary: 75000 });
+                }
+                updateDashboard();
+            }, (error) => {
+                console.error("Firestore read error: ", error);
+            });
+
+            // 2. Sync Expense Entries collection list
+            unsubscribeExpenses = onSnapshot(expensesColRef, (colSnap) => {
                 expenses = [];
+                colSnap.forEach((doc) => {
+                    expenses.push({ id: doc.id, ...doc.data() });
+                });
                 updateDashboard();
                 renderExpenses();
-                showNotification("All expense items removed successfully", "pink");
+            }, (error) => {
+                console.error("Firestore sync ledger error: ", error);
             });
         }
 
-        // Format raw currency values securely
+        // Clean up connections on lock
+        window.handleLogout = () => {
+            showConfirm("Are you sure you want to lock and exit the current session?", () => {
+                if (unsubscribeSettings) unsubscribeSettings();
+                if (unsubscribeExpenses) unsubscribeExpenses();
+
+                workspaceId = "";
+                expenses = [];
+                document.getElementById('login-username').value = "";
+                document.getElementById('login-password').value = "";
+
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.body.classList.add('justify-center', 'items-center');
+
+                showNotification("Session closed and locked.", "pink");
+            });
+        };
+
+        // Format Currency to Rupees (₹)
         function formatCurrency(value) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'INR',
+                maximumFractionDigits: 0
             }).format(value);
         }
 
-        // Add single expense entry from submission form
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            const titleInput = document.getElementById('item-title');
-            const amountInput = document.getElementById('item-amount');
-            const categorySelect = document.getElementById('item-category');
-            const dateInput = document.getElementById('item-date');
-
-            const expenseObj = {
-                id: 'exp-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-                title: titleInput.value.trim(),
-                amount: parseFloat(amountInput.value),
-                category: categorySelect.value,
-                date: dateInput.value
-            };
-
-            expenses.unshift(expenseObj);
-
-            // Re-render and update UI
-            updateDashboard();
-            renderExpenses();
-
-            // Notify user
-            showNotification(`Entry: "${expenseObj.title}" successfully added`, "green");
-
-            // Form Reset (keeping standard user parameters logical)
-            titleInput.value = '';
-            amountInput.value = '';
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
-        }
-
-        // Remove a single expense
-        function deleteExpense(expenseId) {
-            const index = expenses.findIndex(e => e.id === expenseId);
-            if (index !== -1) {
-                const deletedName = expenses[index].title;
-                expenses.splice(index, 1);
-                updateDashboard();
-                renderExpenses();
-                showNotification(`Removed ledger record: "${deletedName}"`, "pink");
-            }
-        }
-
-        // Update Global Overview Indicators
+        // Update Dashboard indicators
         function updateDashboard() {
-            // Calculated Sum
-            const total = expenses.reduce((sum, item) => sum + item.amount, 0);
-            document.getElementById('total-amount').textContent = formatCurrency(total);
+            // Computed expenses spent
+            const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
+            document.getElementById('total-amount').textContent = formatCurrency(totalSpent);
 
-            // Entry Count
+            // Salary display update
+            document.getElementById('salary-display').textContent = formatCurrency(salary);
+
+            // Compute Remain Amount
+            const remainAmount = salary - totalSpent;
+            const balanceEl = document.getElementById('remaining-balance');
+            const balanceContainer = document.getElementById('balance-container');
+
+            balanceEl.textContent = formatCurrency(remainAmount);
+
+            // Warning styling if overspent
+            if (remainAmount < 0) {
+                balanceContainer.className = "bg-black p-4 border-2 border-brand-pink shadow-flat-sm";
+                balanceEl.className = "text-xl font-black text-brand-pink animate-pulse";
+            } else {
+                balanceContainer.className = "bg-black p-4 border-2 border-brand-blue shadow-flat-sm";
+                balanceEl.className = "text-xl font-black text-brand-blue";
+            }
+
+            // Entries Count
             document.getElementById('stat-count').textContent = expenses.length;
 
-            // Calculated Average
-            const avg = expenses.length > 0 ? (total / expenses.length) : 0;
+            // Calculated average
+            const avg = expenses.length > 0 ? (totalSpent / expenses.length) : 0;
             document.getElementById('stat-average').textContent = formatCurrency(avg);
 
-            // Set Monthly Budget calculations
-            document.getElementById('budget-value').textContent = formatCurrency(budget);
-            const budgetPercent = budget > 0 ? Math.min(100, Math.round((total / budget) * 100)) : 0;
-            document.getElementById('budget-percent').textContent = `${budgetPercent}% Used`;
+            // Salary allocation utilization bar calculations
+            const usagePercent = salary > 0 ? Math.min(100, Math.round((totalSpent / salary) * 100)) : 0;
+            document.getElementById('budget-percent').textContent = `${usagePercent}% of Salary Spent`;
 
             const progressBar = document.getElementById('budget-progress-bar');
-            progressBar.style.width = `${budgetPercent}%`;
-            
-            // Over-budget Warning Theme Switch
-            if (total > budget) {
+            progressBar.style.width = `${usagePercent}%`;
+
+            if (totalSpent > salary) {
                 progressBar.classList.remove('bg-brand-blue');
                 progressBar.classList.add('bg-brand-pink');
                 document.getElementById('budget-percent').classList.add('text-brand-pink');
@@ -479,11 +591,132 @@
                 document.getElementById('budget-percent').classList.add('text-zinc-400');
             }
 
-            // Update Dynamic Distribution Chart List
-            renderCategoryBars(total);
+            renderCategoryBars(totalSpent);
         }
 
-        // Draw allocations per Category nicely with strict CSS Blocks
+        // Add transaction entry to Firestore database
+        document.getElementById('expense-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!user || !workspaceId) return;
+
+            const titleInput = document.getElementById('item-title');
+            const amountInput = document.getElementById('item-amount');
+            const categorySelect = document.getElementById('item-category');
+            const dateInput = document.getElementById('item-date');
+
+            const expensePayload = {
+                title: titleInput.value.trim(),
+                amount: parseFloat(amountInput.value),
+                category: categorySelect.value,
+                date: dateInput.value,
+                timestamp: Date.now()
+            };
+
+            try {
+                const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+                await addDoc(expensesColRef, expensePayload);
+                showNotification(`Added transaction: "${expensePayload.title}"`, "green");
+
+                // Reset forms
+                titleInput.value = '';
+                amountInput.value = '';
+                document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
+            } catch (error) {
+                console.error("Firestore push error: ", error);
+                showNotification("Sync Failed: Check configuration.", "pink");
+            }
+        });
+
+        // Delete specific entry from Firestore securely
+        window.deleteExpense = async (expenseId) => {
+            if (!user || !workspaceId) return;
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, expenseId);
+                await deleteDoc(docRef);
+                showNotification("Transaction deleted from cloud ledger", "pink");
+            } catch (error) {
+                console.error("Firestore delete error: ", error);
+                showNotification("Could not delete record.", "pink");
+            }
+        };
+
+        // Render Ledger Entries
+        function renderExpenses() {
+            const listEl = document.getElementById('ledger-list');
+            listEl.innerHTML = '';
+
+            const selectedCat = document.getElementById('filter-category').value;
+            const sortOrder = document.getElementById('sort-order').value;
+            const searchQuery = document.getElementById('search-ledger').value.toLowerCase().trim();
+
+            let filtered = expenses.filter(item => {
+                const matchesCategory = selectedCat === "ALL" || item.category === selectedCat;
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery);
+                return matchesCategory && matchesSearch;
+            });
+
+            // Sort
+            if (sortOrder === "date-desc") {
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (sortOrder === "date-asc") {
+                filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } else if (sortOrder === "amount-desc") {
+                filtered.sort((a, b) => b.amount - a.amount);
+            } else if (sortOrder === "amount-asc") {
+                filtered.sort((a, b) => a.amount - b.amount);
+            }
+
+            document.getElementById('filtered-count').textContent = `Showing ${filtered.length} / ${expenses.length} entries`;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-8 text-center uppercase text-xs font-bold text-zinc-600 tracking-wider">
+                        No transactions found matching workspace filters.
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const colorSet = categoryColors[item.category] || { bg: 'bg-zinc-500', border: 'border-zinc-500' };
+                const formattedDate = new Date(item.date).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'UTC'
+                });
+
+                const ledgerRow = `
+                    <div class="p-4 hover:bg-zinc-950 transition-colors flex justify-between items-center gap-4 group">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-2.5 h-10 shrink-0 ${colorSet.bg} border border-black"></div>
+                            <div class="min-w-0">
+                                <h4 class="text-sm font-bold uppercase truncate text-white group-hover:text-brand-yellow transition-colors">${item.title}</h4>
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 font-bold uppercase mt-0.5">
+                                    <span>${formattedDate}</span>
+                                    <span>•</span>
+                                    <span class="text-zinc-400">${item.category}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 shrink-0">
+                            <span class="text-base font-extrabold text-white font-mono">${formatCurrency(item.amount)}</span>
+                            <button onclick="deleteExpense('${item.id}')" aria-label="Delete entry"
+                                    class="bg-brand-pink text-black p-2 hover:bg-red-500 border-2 border-black active:translate-y-[1px] transition-all flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="square" stroke-linejoin="miter" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                listEl.insertAdjacentHTML('beforeend', ledgerRow);
+            });
+        }
+
+        // Draw Allocations
         function renderCategoryBars(totalSpent) {
             const container = document.getElementById('category-distribution-container');
             container.innerHTML = '';
@@ -493,28 +726,18 @@
                 return;
             }
 
-            // Calculate sums per category type
             const sums = {};
-            // Init keys
             Object.keys(categoryColors).forEach(cat => sums[cat] = 0);
-            
-            // Build totals
             expenses.forEach(item => {
-                if (sums[item.category] !== undefined) {
-                    sums[item.category] += item.amount;
-                } else {
-                    sums[item.category] = item.amount;
-                }
+                if (sums[item.category] !== undefined) sums[item.category] += item.amount;
             });
 
-            // Draw progress lines for populated structures
             Object.entries(sums)
-                .sort((a, b) => b[1] - a[1]) // highest first
+                .sort((a, b) => b[1] - a[1])
                 .forEach(([cat, amt]) => {
-                    if (amt === 0) return; // Skip drawing zero items for space efficiency
-
+                    if (amt === 0) return;
                     const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
-                    const colorSet = categoryColors[cat] || { bg: 'bg-zinc-500', hex: '#6b7280' };
+                    const colorSet = categoryColors[cat] || { bg: 'bg-zinc-500' };
 
                     const itemHtml = `
                         <div class="bg-black p-3 border-2 border-zinc-800 flex flex-col gap-1.5 hover:border-white transition-all">
@@ -534,120 +757,105 @@
                 });
         }
 
-        // Render Ledger Entries with complete filters & search queries
-        function renderExpenses() {
-            const listEl = document.getElementById('ledger-list');
-            listEl.innerHTML = '';
-
-            const selectedCat = document.getElementById('filter-category').value;
-            const sortOrder = document.getElementById('sort-order').value;
-            const searchQuery = document.getElementById('search-ledger').value.toLowerCase().trim();
-
-            // Filter
-            let filtered = expenses.filter(item => {
-                const matchesCategory = selectedCat === "ALL" || item.category === selectedCat;
-                const matchesSearch = item.title.toLowerCase().includes(searchQuery);
-                return matchesCategory && matchesSearch;
+        // Populating Cloud Sample Demo Data
+        document.getElementById('btn-demo').addEventListener('click', () => {
+            if (!user || !workspaceId) return;
+            showConfirm("This will write mock demo transactions into your secure Cloud Ledger. Proceed?", async () => {
+                const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+                for (const item of demoData) {
+                    await addDoc(expensesColRef, { ...item, timestamp: Date.now() });
+                }
+                showNotification("Demo Cloud data successfully synchronized", "yellow");
             });
+        });
 
-            // Sort
-            if (sortOrder === "date-desc") {
-                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else if (sortOrder === "date-asc") {
-                filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-            } else if (sortOrder === "amount-desc") {
-                filtered.sort((a, b) => b.amount - a.amount);
-            } else if (sortOrder === "amount-asc") {
-                filtered.sort((a, b) => a.amount - b.amount);
-            }
-
-            // Update Counter Text
-            document.getElementById('filtered-count').textContent = `Showing ${filtered.length} / ${expenses.length} entries`;
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="p-8 text-center uppercase text-xs font-bold text-zinc-600 tracking-wider">
-                        No ledger files found matching selected parameters.
-                    </div>
-                `;
-                return;
-            }
-
-            // Display elements
-            filtered.forEach(item => {
-                const colorSet = categoryColors[item.category] || { bg: 'bg-zinc-500', border: 'border-zinc-500' };
-                const formattedDate = new Date(item.date).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    timeZone: 'UTC'
-                });
-
-                const ledgerRow = `
-                    <div class="p-4 hover:bg-zinc-950 transition-colors flex justify-between items-center gap-4 group">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <!-- Sharp category colored identifier block -->
-                            <div class="w-2.5 h-10 shrink-0 ${colorSet.bg} border border-black"></div>
-                            
-                            <div class="min-w-0">
-                                <h4 class="text-sm font-bold uppercase truncate text-white group-hover:text-brand-yellow transition-colors">${item.title}</h4>
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 font-bold uppercase mt-0.5">
-                                    <span>${formattedDate}</span>
-                                    <span>•</span>
-                                    <span class="text-zinc-400">${item.category}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 shrink-0">
-                            <span class="text-base font-extrabold text-white font-mono">${formatCurrency(item.amount)}</span>
-                            
-                            <!-- Square Delete Expense Button -->
-                            <button onclick="deleteExpense('${item.id}')" aria-label="Delete expense"
-                                    class="bg-brand-pink text-black p-2 hover:bg-red-500 border-2 border-black active:translate-y-[1px] transition-all flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="square" stroke-linejoin="miter" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                listEl.insertAdjacentHTML('beforeend', ledgerRow);
+        // Wiping Cloud Workspace Data
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            if (!user || !workspaceId) return;
+            showConfirm("Are you sure you want to delete all entries from your cloud workspace ledger?", async () => {
+                for (const item of expenses) {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, item.id);
+                    await deleteDoc(docRef);
+                }
+                showNotification("Cloud workspace data completely wiped.", "pink");
             });
-        }
+        });
 
-        // Budget Adjuster Modals
-        function promptBudget() {
-            document.getElementById('new-budget-input').value = budget;
-            document.getElementById('budget-modal').classList.remove('hidden');
-        }
+        // Salary Modal updates
+        document.getElementById('btn-update-salary').addEventListener('click', () => {
+            document.getElementById('new-salary-input').value = salary;
+            document.getElementById('salary-modal').classList.remove('hidden');
+        });
 
-        function closeBudgetModal() {
-            document.getElementById('budget-modal').classList.add('hidden');
-        }
+        document.getElementById('btn-close-salary-modal').addEventListener('click', () => {
+            document.getElementById('salary-modal').classList.add('hidden');
+        });
 
-        function saveBudget() {
-            const inputVal = parseFloat(document.getElementById('new-budget-input').value);
+        document.getElementById('btn-save-salary').addEventListener('click', async () => {
+            if (!user || !workspaceId) return;
+            const inputVal = parseFloat(document.getElementById('new-salary-input').value);
             if (!isNaN(inputVal) && inputVal > 0) {
-                budget = inputVal;
-                updateDashboard();
-                closeBudgetModal();
-                showNotification(`Monthly budget adjusted to ${formatCurrency(budget)}`, "blue");
+                try {
+                    const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
+                    await setDoc(settingsDocRef, { salary: inputVal }, { merge: true });
+                    document.getElementById('salary-modal').classList.add('hidden');
+                    showNotification("Salary parameters synchronized", "green");
+                } catch (error) {
+                    console.error("Firestore settings set error: ", error);
+                }
             }
+        });
+
+        // Event hooks for filters/sort
+        document.getElementById('filter-category').addEventListener('change', renderExpenses);
+        document.getElementById('sort-order').addEventListener('change', renderExpenses);
+        document.getElementById('search-ledger').addEventListener('input', renderExpenses);
+
+        // Toast trigger helper
+        function showNotification(message, type = "green") {
+            const toast = document.getElementById('toast-notification');
+            const indicator = document.getElementById('toast-indicator');
+            const text = document.getElementById('toast-text');
+
+            text.textContent = message;
+            indicator.className = "w-4 h-4 border border-black";
+            if (type === "green") indicator.classList.add("bg-brand-green");
+            if (type === "pink") indicator.classList.add("bg-brand-pink");
+            if (type === "blue") indicator.classList.add("bg-brand-blue");
+            if (type === "yellow") indicator.classList.add("bg-brand-yellow");
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
         }
 
-        // Export data to CSV
-        function downloadCSV() {
+        // Custom Confirmation dialog helper
+        function showConfirm(message, onOk) {
+            const modal = document.getElementById('confirm-modal');
+            const msgEl = document.getElementById('confirm-message');
+            const cancelBtn = document.getElementById('confirm-cancel');
+            const okBtn = document.getElementById('confirm-ok');
+
+            msgEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const close = () => modal.classList.add('hidden');
+            cancelBtn.onclick = () => { close(); };
+            okBtn.onclick = () => { close(); onOk(); };
+        }
+
+        // Export as CSV
+        document.getElementById('btn-export').addEventListener('click', () => {
             if (expenses.length === 0) {
-                showNotification("Nothing to export! Record some expenses first.", "pink");
+                showNotification("No transactions to export!", "pink");
                 return;
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "ID,Title,Amount,Category,Date\n";
+            csvContent += "ID,Title,Amount (INR),Category,Date\n";
 
             expenses.forEach(item => {
-                // Escape commas or double quotes to avoid CSV structure issues
                 const escTitle = `"${item.title.replace(/"/g, '""')}"`;
                 csvContent += `${item.id},${escTitle},${item.amount},${item.category},${item.date}\n`;
             });
@@ -655,13 +863,13 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `square_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `square_INR_ledger_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            showNotification("Ledger exported successfully", "green");
-        }
+
+            showNotification("Ledger CSV downloaded", "green");
+        });
     </script>
 </body>
 </html>
