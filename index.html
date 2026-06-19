@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQUARE - Sleek Premium Expense Tracker</title>
+    <title>SQUARE - Premium Live Expense Tracker</title>
     <!-- Tailwind CSS for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,7 +29,7 @@
         }
     </script>
     <style>
-        /* Sleek premium typography matching the design mock */
+        /* Modern neo-brutalist and sleek typography */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         body {
@@ -39,7 +39,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Custom scrollbar for horizontal month scroll */
+        /* Hide scrollbar for clean aesthetics */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -48,7 +48,7 @@
             scrollbar-width: none;  /* Firefox */
         }
 
-        /* Ring segment transitions */
+        /* Transition segments */
         .chart-segment {
             transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease, stroke-width 0.2s ease;
         }
@@ -56,13 +56,11 @@
 </head>
 <body class="min-h-screen flex flex-col justify-center items-center p-0 sm:p-4">
 
-    <!-- INITIAL HANDSHAKE LOADING -->
     <div id="loading-screen" class="fixed inset-0 bg-darkBg z-50 flex flex-col items-center justify-center gap-4">
         <div class="animate-spin w-12 h-12 border-4 border-brandGreen border-t-transparent rounded-full"></div>
         <p class="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-2">Securing Cloud Handshake...</p>
     </div>
 
-    <!-- AUTHENTICATION LAYER -->
     <div id="login-screen" class="hidden w-full max-w-md bg-darkCard p-8 rounded-3xl shadow-premium border border-zinc-800 flex flex-col gap-6 mx-4">
         <div class="text-center">
             <h1 class="text-2xl font-extrabold text-white tracking-tight">SQUARE_SECURE</h1>
@@ -101,7 +99,6 @@
         </form>
     </div>
 
-    <!-- MAIN MOBILE CONTAINER APP FRAME -->
     <div id="app-screen" class="hidden w-full max-w-md bg-darkBg sm:rounded-[40px] shadow-premium sm:border-[8px] border-zinc-800 flex flex-col overflow-hidden min-h-screen sm:min-h-[850px] relative">
         
         <!-- TOP APP HEADER -->
@@ -118,7 +115,14 @@
             </div>
         </header>
 
-        <!-- HORIZONTAL MONTH TABS (January to December Filter) -->
+        <div class="px-6 py-2">
+            <div class="bg-brandOrange/10 border border-brandOrange/30 p-2.5 rounded-xl text-[10px] font-bold text-brandOrange uppercase tracking-wide flex items-center gap-2">
+                <span>⚠️</span>
+                <span>Virtual Simulator: Never enter real banking passwords or actual card PINs.</span>
+            </div>
+        </div>
+
+        <!-- HORIZONTAL MONTH TABS -->
         <div class="px-6 py-2 overflow-x-auto flex gap-4 no-scrollbar border-b border-zinc-900 bg-darkBg">
             <button onclick="filterByMonth(0)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">January</button>
             <button onclick="filterByMonth(1)" class="month-tab shrink-0 text-sm font-semibold pb-2 border-b-2 border-transparent transition-all text-zinc-500 hover:text-white">February</button>
@@ -136,19 +140,30 @@
 
         <!-- CORE STATS BALANCE VIEW -->
         <div class="px-6 pt-5 grid grid-cols-2 gap-4">
-            <!-- Total Balance (Salary) -->
+            <!-- Total Balance (Calculated automatically from simulated cards) -->
             <div class="bg-darkCard p-4 rounded-2xl border border-zinc-800 relative group overflow-hidden">
                 <span class="text-[11px] font-semibold text-zinc-400 block mb-1 uppercase tracking-wide">Total Balance</span>
                 <span id="salary-display" class="text-xl font-bold text-white block">₹0</span>
-                <button onclick="openSalaryModal()" class="absolute right-3 bottom-3 p-1.5 bg-zinc-800 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                </button>
+                <div class="absolute right-3 bottom-3 text-xs text-brandGreen font-bold tracking-wide uppercase">Auto</div>
             </div>
             
             <!-- Total Expense -->
             <div class="bg-darkCard p-4 rounded-2xl border border-zinc-800">
                 <span class="text-[11px] font-semibold text-zinc-400 block mb-1 uppercase tracking-wide">Total Expense</span>
                 <span id="total-expense-display" class="text-xl font-bold text-white block">₹0</span>
+            </div>
+        </div>
+
+        <!-- WALLETS / BANK ACCOUNTS LIST SECTION -->
+        <div class="px-6 pt-5">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-extrabold uppercase tracking-widest text-zinc-400">Mock Wallets / Bank Accounts</h3>
+                <button onclick="openAddWalletSheet()" class="text-xs font-bold uppercase text-brandGreen hover:underline">+ Add Account</button>
+            </div>
+            <!-- Horizontal Scroll of Simulated Credit/Debit Cards -->
+            <div id="wallets-list-container" class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+                <!-- Cards inject here dynamically -->
+                <div class="text-zinc-500 text-xs font-semibold py-4 uppercase tracking-wide">No wallets active. Click "+ Add Account" to configure mock balances.</div>
             </div>
         </div>
 
@@ -177,7 +192,7 @@
         <!-- HISTORY LEDGERS SECTION -->
         <div class="px-6 pt-5 pb-24 flex-grow flex flex-col">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-sm font-extrabold uppercase tracking-widest text-zinc-400">Recent Ledgers</h3>
+                <h3 class="text-xs font-extrabold uppercase tracking-widest text-zinc-400">Recent Ledgers</h3>
                 <span id="filtered-count" class="text-[11px] font-semibold text-zinc-500 uppercase">0 Entries</span>
             </div>
 
@@ -204,10 +219,57 @@
 
     </div>
 
+    <!-- SLIDE-IN BOTTOM MODAL SHEET: ADD SIMULATED ACCOUNT -->
+    <div id="add-wallet-sheet" class="fixed inset-0 bg-black/80 flex items-end justify-center z-40 hidden transition-opacity duration-300">
+        <div class="w-full max-w-md bg-darkCard rounded-t-[32px] p-6 border-t border-zinc-800 flex flex-col gap-5 transform translate-y-full transition-transform duration-300">
+            <div class="flex justify-between items-center pb-2 border-b border-zinc-800/60">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Simulate New Bank/Wallet</h3>
+                <button onclick="closeAddWalletSheet()" class="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <form id="wallet-form" onsubmit="handleWalletSubmit(event)" class="flex flex-col gap-4">
+                <div>
+                    <label for="wallet-name" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Mock Bank / Account Name</label>
+                    <input type="text" id="wallet-name" placeholder="e.g. State Bank of India Mock, Cash" required
+                           class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-700">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="wallet-balance" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Mock Balance (₹)</label>
+                        <input type="number" id="wallet-balance" min="0" placeholder="e.g. 50000" required
+                               class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-700">
+                    </div>
+                    <div>
+                        <label for="wallet-number" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Mock Card Last 4 Digits</label>
+                        <input type="text" id="wallet-number" maxlength="4" placeholder="e.g. 1234" required
+                               class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:border-brandGreen focus:outline-none text-sm placeholder-zinc-700">
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-xs font-bold uppercase mb-2 text-zinc-400">Mock Card Color Theme</span>
+                    <input type="hidden" id="wallet-theme" value="blue">
+                    <div class="flex gap-3">
+                        <button type="button" onclick="selectWalletThemePill('blue')" class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 border-2 border-white" id="theme-blue"></button>
+                        <button type="button" onclick="selectWalletThemePill('green')" class="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-600 to-teal-700 border-2 border-transparent" id="theme-green"></button>
+                        <button type="button" onclick="selectWalletThemePill('pink')" class="w-8 h-8 rounded-full bg-gradient-to-r from-pink-600 to-rose-700 border-2 border-transparent" id="theme-pink"></button>
+                        <button type="button" onclick="selectWalletThemePill('orange')" class="w-8 h-8 rounded-full bg-gradient-to-r from-amber-600 to-orange-700 border-2 border-transparent" id="theme-orange"></button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-brandGreen hover:bg-emerald-400 text-darkBg font-extrabold py-3.5 rounded-xl transition-all shadow-lg shadow-brandGreen/20 text-sm uppercase tracking-wider mt-2">
+                    Create Mock Account
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- SLIDE-IN BOTTOM MODAL SHEET: ADD TRANSACTION -->
     <div id="add-expense-sheet" class="fixed inset-0 bg-black/80 flex items-end justify-center z-40 hidden transition-opacity duration-300">
         <div class="w-full max-w-md bg-darkCard rounded-t-[32px] p-6 border-t border-zinc-800 flex flex-col gap-5 transform translate-y-full transition-transform duration-300">
-            <!-- Header bar -->
             <div class="flex justify-between items-center pb-2 border-b border-zinc-800/60">
                 <h3 class="text-base font-bold text-white uppercase tracking-wider">New Transaction</h3>
                 <button onclick="closeAddExpenseSheet()" class="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-full transition-colors">
@@ -215,7 +277,6 @@
                 </button>
             </div>
 
-            <!-- Form -->
             <form id="expense-form" onsubmit="handleExpenseSubmit(event)" class="flex flex-col gap-4">
                 <div>
                     <label for="item-title" class="block text-xs font-bold uppercase mb-2 text-zinc-400">Description</label>
@@ -257,27 +318,10 @@
         </div>
     </div>
 
-    <!-- UPDATE SALARY MODAL -->
-    <div id="salary-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-darkCard p-6 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-premium">
-            <h3 class="text-base font-bold uppercase text-white border-b border-zinc-800/60 pb-3 mb-4">Set Monthly Income</h3>
-            <div class="flex flex-col gap-4">
-                <div>
-                    <label for="new-salary-input" class="block text-xs font-bold uppercase text-zinc-400 mb-2">Total Salary (₹)</label>
-                    <input type="number" id="new-salary-input" min="1" placeholder="₹50000" class="w-full bg-darkBg text-white rounded-xl p-3.5 border border-zinc-800 focus:outline-none text-sm placeholder-zinc-700">
-                </div>
-                <div class="flex justify-end gap-2 mt-2">
-                    <button onclick="closeSalaryModal()" class="bg-zinc-800 text-zinc-400 hover:text-white font-semibold py-2.5 px-4 rounded-xl text-xs uppercase">Cancel</button>
-                    <button onclick="saveSalary()" class="bg-brandGreen text-darkBg font-bold py-2.5 px-4 rounded-xl text-xs uppercase">Save Income</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- CUSTOM CONFIRM DIALOG MODAL -->
     <div id="confirm-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-darkCard p-6 rounded-3xl border border-zinc-800 max-w-sm w-full shadow-premium">
-            <h3 class="text-base font-bold uppercase text-brandPink border-b border-zinc-800/60 pb-3 mb-2">Attention</h3>
+            <h3 class="text-base font-bold uppercase text-brandPink border-b-2 border-zinc-800/60 pb-3 mb-2">Attention</h3>
             <p id="confirm-message" class="text-xs text-zinc-400 uppercase font-medium mb-6 leading-relaxed"></p>
             <div class="flex justify-end gap-2">
                 <button id="confirm-cancel" class="bg-zinc-800 text-zinc-400 hover:text-white font-semibold py-2.5 px-4 rounded-xl text-xs uppercase">Cancel</button>
@@ -296,7 +340,6 @@
 
     <!-- Firebase Real-Time Synchronization Scripts -->
     <script type="module">
-        // Import Firebase ES Modules safely
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -306,7 +349,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : {
-                apiKey: "", // Left blank for local fallback
+                apiKey: "", 
                 authDomain: "square-expense-realtime.firebaseapp.com",
                 projectId: "square-expense-realtime",
                 storageBucket: "square-expense-realtime.appspot.com",
@@ -316,14 +359,13 @@
 
         // App State parameters
         let isLocalFallback = false;
-        let authMode = "login"; // "login" or "register"
+        let authMode = "login"; 
         let expenses = [];
-        let salary = 75000; // Default Salary
-        let workspaceId = ""; // Derived namespace to isolate workspace based on Username/Password hash
-        let user = null; // Firebase user
-        let selectedMonth = new Date().getMonth(); // Active month selector filter (0-11)
+        let wallets = []; // Array of simulated bank wallets
+        let workspaceId = ""; 
+        let user = null; 
+        let selectedMonth = new Date().getMonth(); 
 
-        // Configuration mapping colors to category indices
         const categoryColors = {
             'Food & Dining': { text: 'text-brandGreen', fill: '#55EF9E', bg: 'bg-brandGreen/10', border: 'border-brandGreen' },
             'Transport & Auto': { text: 'text-brandBlue', fill: '#3CC4EC', bg: 'bg-brandBlue/10', border: 'border-brandBlue' },
@@ -333,14 +375,10 @@
             'Miscellaneous': { text: 'text-brandOrange', fill: '#FF9F43', bg: 'bg-brandOrange/10', border: 'border-brandOrange' }
         };
 
-        // Standard Demo Logs setup matching the visuals
-        const demoData = [
-            { title: "Organic Grocery Store Run", amount: 6200, category: "Food & Dining", date: getOffsetDate(-1) },
-            { title: "Uber Cab Charge", amount: 450, category: "Transport & Auto", date: getOffsetDate(-2) },
-            { title: "Premium Cinema Ticket", amount: 1200, category: "Entertainment", date: getOffsetDate(-3) },
-            { title: "High-Speed WiFi Bill", amount: 1999, category: "Utilities & Bills", date: getOffsetDate(-5) },
-            { title: "Mechanical Keyboard", amount: 8500, category: "Shopping & Custom", date: getOffsetDate(-8) },
-            { title: "Local Snacks & Chai", amount: 350, category: "Food & Dining", date: getOffsetDate(-10) }
+        const defaultMockWallets = [
+            { id: "mock-w1", name: "State Bank of India Simulator", number: "9876", balance: 50000, theme: "blue" },
+            { id: "mock-w2", name: "HDFC Simulator", number: "1243", balance: 25000, theme: "green" },
+            { id: "mock-w3", name: "Simulated Cash Pocket", number: "0000", balance: 3500, theme: "pink" }
         ];
 
         // Connection Timeout Trigger
@@ -365,7 +403,6 @@
             document.getElementById('workspace-mode-label').className = "bg-brandOrange/20 text-brandOrange px-3 py-1 rounded-full font-bold text-[10px] uppercase";
         }
 
-        // Initialize Firebase securely with fallback support
         let app, auth, db;
         try {
             if (firebaseConfig.apiKey) {
@@ -400,7 +437,6 @@
             activateOfflineFallback();
         }
 
-        // Tab switching logic for sign-in/registration
         window.switchAuthTab = (mode) => {
             authMode = mode;
             const tabLogin = document.getElementById('tab-login');
@@ -418,7 +454,7 @@
             }
         };
 
-        // Deterministic SHA-256 Workspace key generator
+        // Hashing Workspace key generator
         async function getDeterministicHash(username, password) {
             const msgUint8 = new TextEncoder().encode(username.trim().toLowerCase() + "::" + password.trim());
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -426,7 +462,6 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
         }
 
-        // Auth Submissions
         window.handleAuthSubmit = async (e) => {
             e.preventDefault();
             const usernameInput = document.getElementById('auth-username').value.trim();
@@ -444,7 +479,7 @@
                         return;
                     }
                     localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify([]));
-                    localStorage.setItem(`salary-${workspaceId}`, "75000");
+                    localStorage.setItem(`wallets-${workspaceId}`, JSON.stringify(defaultMockWallets));
                     showNotification("Workspace Profile created locally!", "green");
                 } else {
                     const checkExist = localStorage.getItem(`expenses-${workspaceId}`);
@@ -456,7 +491,6 @@
                 proceedIntoApp(usernameInput);
                 startLocalListeners();
             } else {
-                // Cloud Sync Actions
                 try {
                     const workspaceCheckRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
                     const workspaceCheck = await getDoc(workspaceCheckRef);
@@ -466,7 +500,7 @@
                             showNotification("Workspace profile already exists!", "pink");
                             return;
                         }
-                        await setDoc(workspaceCheckRef, { salary: 75000, initialized: true });
+                        await setDoc(workspaceCheckRef, { initialized: true });
                         showNotification("Workspace profile registered in cloud!", "green");
                     } else {
                         if (!workspaceCheck.exists()) {
@@ -492,18 +526,14 @@
             document.body.classList.remove('justify-center', 'items-center');
             document.getElementById('user-display').textContent = username.toUpperCase();
             
-            // Set default date input value to today
             document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
-            
-            // Set active highlighted month tab
             filterByMonth(new Date().getMonth());
             selectCategoryPill('Food & Dining');
         }
 
-        // Local Storage Mode listeners
         function startLocalListeners() {
-            const cachedSalary = localStorage.getItem(`salary-${workspaceId}`);
-            salary = cachedSalary ? parseFloat(cachedSalary) : 75000;
+            const cachedWallets = localStorage.getItem(`wallets-${workspaceId}`);
+            wallets = cachedWallets ? JSON.parse(cachedWallets) : defaultMockWallets;
 
             const cachedExpenses = localStorage.getItem(`expenses-${workspaceId}`);
             expenses = cachedExpenses ? JSON.parse(cachedExpenses) : [];
@@ -511,25 +541,19 @@
             updateDashboard();
         }
 
-        // Cloud Real-Time snapshot sync
         let unsubscribeSettings = null;
         let unsubscribeExpenses = null;
+        let unsubscribeWallets = null;
 
         function startRealtimeListeners() {
             if (!user) return;
 
             const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
             const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
+            const walletsColRef = collection(db, 'artifacts', appId, 'users', user.uid, `wallets-${workspaceId}`);
 
             unsubscribeSettings = onSnapshot(settingsDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    salary = docSnap.data().salary || 75000;
-                } else {
-                    setDoc(settingsDocRef, { salary: 75000 });
-                }
                 updateDashboard();
-            }, (error) => {
-                console.error("Firestore settings sync error: ", error);
             });
 
             unsubscribeExpenses = onSnapshot(expensesColRef, (colSnap) => {
@@ -538,25 +562,32 @@
                     expenses.push({ id: doc.id, ...doc.data() });
                 });
                 updateDashboard();
-            }, (error) => {
-                console.error("Firestore expense list read error: ", error);
+            });
+
+            unsubscribeWallets = onSnapshot(walletsColRef, (colSnap) => {
+                wallets = [];
+                colSnap.forEach((doc) => {
+                    wallets.push({ id: doc.id, ...doc.data() });
+                });
+                if (wallets.length === 0) {
+                    // Populate default mock simulated cards in cloud database
+                    defaultMockWallets.forEach(async (w) => {
+                        await addDoc(walletsColRef, w);
+                    });
+                }
+                updateDashboard();
             });
         }
 
-        function getOffsetDate(daysOffset) {
-            const date = new Date();
-            date.setDate(date.getDate() + daysOffset);
-            return date.toISOString().split('T')[0];
-        }
-
-        // Clean up connections on lock
         window.handleLogout = () => {
             showConfirm("Are you sure you want to lock and exit the current session?", () => {
                 if (unsubscribeSettings) unsubscribeSettings();
                 if (unsubscribeExpenses) unsubscribeExpenses();
+                if (unsubscribeWallets) unsubscribeWallets();
 
                 workspaceId = "";
                 expenses = [];
+                wallets = [];
                 document.getElementById('auth-username').value = "";
                 document.getElementById('auth-password').value = "";
 
@@ -568,7 +599,6 @@
             });
         };
 
-        // Formats raw currency values securely to INR
         function formatCurrency(value) {
             return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
@@ -577,66 +607,142 @@
             }).format(value);
         }
 
-        // Filter elements by clicked month tab
         window.filterByMonth = (monthIndex) => {
             selectedMonth = monthIndex;
-            
-            // Highlight appropriate Month Tab
             const tabs = document.querySelectorAll('.month-tab');
             tabs.forEach((tab, index) => {
                 if (index === monthIndex) {
                     tab.classList.add('border-brandGreen', 'text-white');
                     tab.classList.remove('border-transparent', 'text-zinc-500');
-                    // Scroll tab smoothly into view if needed
                     tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                 } else {
                     tab.classList.remove('border-brandGreen', 'text-white');
                     tab.classList.add('border-transparent', 'text-zinc-500');
                 }
             });
-
             updateDashboard();
         };
 
-        // Update Dashboard indicators and metrics
         function updateDashboard() {
             // Filter expenses strictly to the active selected month
             const filteredExpenses = expenses.filter(item => {
                 const itemDate = new Date(item.date);
-                // Handle timezone safe comparisons
                 const itemMonth = itemDate.getUTCMonth();
                 return itemMonth === selectedMonth;
             });
 
-            // Calculate metrics
+            // Sum of all simulated wallet cards
+            const totalBalance = wallets.reduce((sum, item) => sum + item.balance, 0);
             const totalSpent = filteredExpenses.reduce((sum, item) => sum + item.amount, 0);
             
             document.getElementById('total-expense-display').textContent = formatCurrency(totalSpent);
-            document.getElementById('salary-display').textContent = formatCurrency(salary);
-
-            // Set metric total spent inside chart center
+            document.getElementById('salary-display').textContent = formatCurrency(totalBalance);
             document.getElementById('center-total-display').textContent = formatCurrency(totalSpent);
 
-            // Re-render visual chart and details ledger
             drawDoughnutChart(filteredExpenses, totalSpent);
             renderLedgerList(filteredExpenses);
+            renderWalletsList();
         }
 
-        // polarToCartesian for drawing segments
-        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-            const angleInRadians = (angleInDegrees) * Math.PI / 180.0;
-            return {
-                x: centerX + (radius * Math.cos(angleInRadians)),
-                y: centerY + (radius * Math.sin(angleInRadians))
+        function renderWalletsList() {
+            const container = document.getElementById('wallets-list-container');
+            container.innerHTML = '';
+
+            if (wallets.length === 0) {
+                container.innerHTML = `<div class="text-zinc-500 text-xs font-semibold py-4 uppercase tracking-wide">No active wallets. Click "+ Add Account" to begin.</div>`;
+                return;
+            }
+
+            wallets.forEach(wallet => {
+                let gradientClass = "from-blue-600 to-indigo-700";
+                if (wallet.theme === "green") gradientClass = "from-emerald-600 to-teal-700";
+                if (wallet.theme === "pink") gradientClass = "from-pink-600 to-rose-700";
+                if (wallet.theme === "orange") gradientClass = "from-amber-600 to-orange-700";
+
+                const cardHtml = `
+                    <div class="shrink-0 w-44 bg-gradient-to-r ${gradientClass} p-4 rounded-2xl flex flex-col justify-between shadow-lg h-28 relative overflow-hidden group">
+                        <!-- Simulated chip accent -->
+                        <div class="absolute right-3 top-3 w-6 h-4 bg-yellow-400/20 border border-yellow-400/40 rounded-sm"></div>
+                        <div>
+                            <p class="text-[9px] font-semibold text-white/70 uppercase tracking-widest truncate max-w-[120px]">${wallet.name}</p>
+                            <p class="text-[10px] font-mono text-white/50 mt-0.5">•••• ${wallet.number}</p>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <p class="text-sm font-bold text-white tracking-wide">${formatCurrency(wallet.balance)}</p>
+                            <button onclick="deleteWallet('${wallet.id}')" class="text-[9px] text-white/40 hover:text-white uppercase font-bold tracking-wider">Wipe</button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // Custom Wallet Form Handler
+        window.handleWalletSubmit = async (e) => {
+            e.preventDefault();
+            if (!workspaceId) return;
+
+            const nameInput = document.getElementById('wallet-name');
+            const balanceInput = document.getElementById('wallet-balance');
+            const numberInput = document.getElementById('wallet-number');
+            const themeInput = document.getElementById('wallet-theme');
+
+            const payload = {
+                name: nameInput.value.trim(),
+                balance: parseFloat(balanceInput.value),
+                number: numberInput.value.trim(),
+                theme: themeInput.value
             };
-        }
 
-        // Generates clean segmented circular sections on SVG directly using robust Stroke-Dasharray
+            if (isLocalFallback) {
+                const uniqueId = 'local-wallet-' + Date.now();
+                wallets.push({ id: uniqueId, ...payload });
+                localStorage.setItem(`wallets-${workspaceId}`, JSON.stringify(wallets));
+                updateDashboard();
+                closeAddWalletSheet();
+                showNotification(`Added mock wallet: "${payload.name}"`, "green");
+            } else {
+                try {
+                    const walletsColRef = collection(db, 'artifacts', appId, 'users', user.uid, `wallets-${workspaceId}`);
+                    await addDoc(walletsColRef, payload);
+                    closeAddWalletSheet();
+                    showNotification(`Added mock wallet: "${payload.name}"`, "green");
+                } catch (error) {
+                    console.error("Firestore push error: ", error);
+                    showNotification("Database Sync Failed", "pink");
+                }
+            }
+
+            nameInput.value = '';
+            balanceInput.value = '';
+            numberInput.value = '';
+            selectWalletThemePill('blue');
+        };
+
+        window.deleteWallet = async (walletId) => {
+            if (!workspaceId) return;
+            showConfirm("Are you sure you want to remove this simulated account/wallet?", async () => {
+                if (isLocalFallback) {
+                    wallets = wallets.filter(item => item.id !== walletId);
+                    localStorage.setItem(`wallets-${workspaceId}`, JSON.stringify(wallets));
+                    updateDashboard();
+                    showNotification("Simulated card removed locally", "pink");
+                } else {
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `wallets-${workspaceId}`, walletId);
+                        await deleteDoc(docRef);
+                        showNotification("Simulated card removed from cloud", "pink");
+                    } catch (error) {
+                        console.error("Firestore wallet delete error: ", error);
+                    }
+                }
+            });
+        };
+
         function drawDoughnutChart(filteredExpenses, totalSpent) {
             const chartSvg = document.getElementById('doughnut-chart-svg');
             const legendList = document.getElementById('chart-legend-list');
 
-            // Reset list and keep basic background circle
             chartSvg.innerHTML = '<circle cx="60" cy="60" r="46" fill="none" stroke="#2C2C2E" stroke-width="12" />';
             legendList.innerHTML = '';
 
@@ -645,7 +751,6 @@
                 return;
             }
 
-            // Sum per category
             const categorySums = {};
             Object.keys(categoryColors).forEach(cat => categorySums[cat] = 0);
             filteredExpenses.forEach(item => {
@@ -654,7 +759,6 @@
                 }
             });
 
-            // Calculate percentage segments
             const segments = [];
             Object.entries(categorySums).forEach(([category, sum]) => {
                 if (sum > 0) {
@@ -663,23 +767,17 @@
                 }
             });
 
-            // Sort largest to smallest for beautiful visual layering
             segments.sort((a, b) => b.sum - a.sum);
 
-            const r = 46; // radius matching viewBox coordinates
-            const C = 2 * Math.PI * r; // Circumference (~289.027)
+            const r = 46; 
+            const C = 2 * Math.PI * r; 
             let accumulatedPercent = 0;
 
             segments.forEach((segment) => {
                 const colors = categoryColors[segment.category];
-                
-                // stroke-dasharray consists of "dash-length gap-length"
                 const dashLength = C * (segment.percentage / 100);
-                
-                // negative stroke-dashoffset shifts segments clockwise
                 const offset = -C * (accumulatedPercent / 100);
 
-                // Create SVG Circle Element for perfectly robust segment drawing
                 const circleNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circleNode.setAttribute("cx", "60");
                 circleNode.setAttribute("cy", "60");
@@ -692,31 +790,8 @@
                 circleNode.setAttribute("class", "chart-segment cursor-pointer transition-all duration-300 hover:stroke-[13px]");
                 chartSvg.appendChild(circleNode);
 
-                // Place labels straight/horizontally inside mid-point of each color segment
-                const midPercent = accumulatedPercent + segment.percentage / 2;
-                const midAngle = (midPercent / 100) * 360 - 90; // Relative to -90 starting point
-                const textPos = polarToCartesian(60, 60, r, midAngle);
-                
-                // Only render text if segment is large enough to contain label cleanly
-                if (segment.percentage >= 6) {
-                    const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    textNode.setAttribute("x", textPos.x.toString());
-                    textNode.setAttribute("y", (textPos.y + 1).toString()); // minor offset adjustment
-                    textNode.setAttribute("fill", "#121214");
-                    textNode.setAttribute("font-size", "5.5");
-                    textNode.setAttribute("font-weight", "800");
-                    textNode.setAttribute("text-anchor", "middle");
-                    textNode.setAttribute("dominant-baseline", "middle");
-                    textNode.textContent = `${Math.round(segment.percentage)}%`;
-                    
-                    // Counter-rotate the text node back to horizontal so it is readable
-                    textNode.setAttribute("transform", `rotate(90, ${textPos.x}, ${textPos.y})`);
-                    chartSvg.appendChild(textNode);
-                }
-
                 accumulatedPercent += segment.percentage;
 
-                // Render matching legend items beneath chart
                 const pillHtml = `
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${colors.fill}"></span>
@@ -728,7 +803,6 @@
             });
         }
 
-        // Render dynamic historical ledger logs
         function renderLedgerList(filteredExpenses) {
             const listContainer = document.getElementById('ledger-list');
             listContainer.innerHTML = '';
@@ -744,7 +818,6 @@
                 return;
             }
 
-            // Sort newest timestamp first
             filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             filteredExpenses.forEach(item => {
@@ -758,11 +831,9 @@
                 const rowHtml = `
                     <div class="bg-darkCard hover:bg-zinc-800/40 p-4 rounded-2xl border border-zinc-800/80 transition-all flex justify-between items-center gap-4 group">
                         <div class="flex items-center gap-3.5 min-w-0">
-                            <!-- Rounded custom visual category identifier icon background -->
                             <div class="w-10 h-10 shrink-0 rounded-xl ${colors.bg} border border-zinc-800/30 flex items-center justify-center">
                                 <span class="w-3 h-3 rounded-full" style="background-color: ${colors.fill}"></span>
                             </div>
-
                             <div class="min-w-0">
                                 <h4 class="text-sm font-bold text-white truncate uppercase">${item.title}</h4>
                                 <div class="flex items-center gap-2 mt-0.5 text-[10px] text-zinc-500 font-bold uppercase">
@@ -772,11 +843,8 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="flex items-center gap-3 shrink-0">
                             <span class="text-sm font-bold text-white tracking-wide font-mono">${formatCurrency(item.amount)}</span>
-                            
-                            <!-- Sleek delete entry icon trigger button -->
                             <button onclick="deleteExpense('${item.id}')" aria-label="Delete entry"
                                     class="p-2 text-zinc-600 hover:text-brandPink rounded-xl bg-zinc-900 border border-zinc-800 hover:border-brandPink/30 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -790,7 +858,6 @@
             });
         }
 
-        // Form submits dynamic transactions
         window.handleExpenseSubmit = async (e) => {
             e.preventDefault();
             if (!workspaceId) return;
@@ -827,14 +894,12 @@
                 }
             }
 
-            // Reset Inputs
             titleInput.value = '';
             amountInput.value = '';
             dateInput.value = new Date().toISOString().split('T')[0];
             selectCategoryPill('Food & Dining');
         };
 
-        // Removes dynamic record
         window.deleteExpense = async (expenseId) => {
             if (!workspaceId) return;
 
@@ -854,16 +919,12 @@
             }
         };
 
-        // Select dynamic categories inside the bottom sheet
         window.selectCategoryPill = (catName) => {
             document.getElementById('item-category').value = catName;
-            
-            // Highlight active visual indicator pill
             const pills = document.querySelectorAll('.cat-pill');
             pills.forEach((pill) => {
                 const isSelected = (pill.textContent.trim().toLowerCase() === catName.split(' ')[0].toLowerCase());
                 const colors = categoryColors[catName];
-                
                 if (isSelected) {
                     pill.className = `cat-pill px-3 py-1.5 rounded-lg text-xs font-semibold ${colors.bg} ${colors.text} border ${colors.border} transition-colors uppercase`;
                 } else {
@@ -872,64 +933,45 @@
             });
         };
 
-        // POPULATE DEMO DATA SETUP
-        window.loadDemoData = () => {
-            if (!workspaceId) return;
-            showConfirm("Populate mock sample logs in your workspace?", async () => {
-                if (isLocalFallback) {
-                    const mappedDemo = demoData.map((item, index) => ({
-                        id: `local-demo-${index}-${Date.now()}`,
-                        ...item,
-                        // Offset matching current selected month target
-                        date: getOffsetDateForMonth(-index)
-                    }));
-                    expenses = [...mappedDemo, ...expenses];
-                    localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify(expenses));
-                    updateDashboard();
-                    showNotification("Local mock logs successfully prepared", "green");
+        window.selectWalletThemePill = (colorName) => {
+            document.getElementById('wallet-theme').value = colorName;
+            const colors = ['blue', 'green', 'pink', 'orange'];
+            colors.forEach(col => {
+                const button = document.getElementById(`theme-${col}`);
+                if (col === colorName) {
+                    button.classList.add('border-white');
+                    button.classList.remove('border-transparent');
                 } else {
-                    const expensesColRef = collection(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`);
-                    for (let i = 0; i < demoData.length; i++) {
-                        const item = demoData[i];
-                        await addDoc(expensesColRef, {
-                            ...item,
-                            date: getOffsetDateForMonth(-i)
-                        });
-                    }
-                    showNotification("Cloud Workspace database populated", "green");
+                    button.classList.remove('border-white');
+                    button.classList.add('border-transparent');
                 }
             });
         };
 
-        // Wipes all log parameters out
         window.clearAllExpenses = () => {
             if (!workspaceId) return;
-            showConfirm("Wipe entire logs history in your database profile?", async () => {
+            showConfirm("Wipe entire ledger & wallet configurations inside this workspace?", async () => {
                 if (isLocalFallback) {
                     expenses = [];
+                    wallets = [];
                     localStorage.setItem(`expenses-${workspaceId}`, JSON.stringify([]));
+                    localStorage.setItem(`wallets-${workspaceId}`, JSON.stringify([]));
                     updateDashboard();
-                    showNotification("Local database wiped successfully.", "pink");
+                    showNotification("Local simulator database wiped.", "pink");
                 } else {
-                    // Wipe Firestore entries
                     for (const item of expenses) {
                         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `expenses-${workspaceId}`, item.id);
                         await deleteDoc(docRef);
                     }
-                    showNotification("Cloud database wiped successfully.", "pink");
+                    for (const wallet of wallets) {
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, `wallets-${workspaceId}`, wallet.id);
+                        await deleteDoc(docRef);
+                    }
+                    showNotification("Cloud workspace database wiped.", "pink");
                 }
             });
         };
 
-        // Helper to map demo logs inside currently targeted month
-        function getOffsetDateForMonth(daysOffset) {
-            const date = new Date();
-            date.setMonth(selectedMonth);
-            date.setDate(date.getDate() + daysOffset);
-            return date.toISOString().split('T')[0];
-        }
-
-        // Slide-in Add Bottom Sheet Dialogs
         window.openAddExpenseSheet = () => {
             const sheet = document.getElementById('add-expense-sheet');
             sheet.classList.remove('hidden');
@@ -946,40 +988,22 @@
             }, 300);
         };
 
-        // Slide-in update monthly balance/income modal
-        window.openSalaryModal = () => {
-            document.getElementById('new-salary-input').value = salary;
-            document.getElementById('salary-modal').classList.remove('hidden');
+        window.openAddWalletSheet = () => {
+            const sheet = document.getElementById('add-wallet-sheet');
+            sheet.classList.remove('hidden');
+            setTimeout(() => {
+                sheet.firstElementChild.classList.remove('translate-y-full');
+            }, 10);
         };
 
-        window.closeSalaryModal = () => {
-            document.getElementById('salary-modal').classList.add('hidden');
+        window.closeAddWalletSheet = () => {
+            const sheet = document.getElementById('add-wallet-sheet');
+            sheet.firstElementChild.classList.add('translate-y-full');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+            }, 300);
         };
 
-        window.saveSalary = async () => {
-            if (!workspaceId) return;
-            const inputVal = parseFloat(document.getElementById('new-salary-input').value);
-            if (!isNaN(inputVal) && inputVal > 0) {
-                if (isLocalFallback) {
-                    salary = inputVal;
-                    localStorage.setItem(`salary-${workspaceId}`, salary.toString());
-                    updateDashboard();
-                    closeSalaryModal();
-                    showNotification("Local monthly balance targets updated", "green");
-                } else {
-                    try {
-                        const settingsDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', workspaceId);
-                        await setDoc(settingsDocRef, { salary: inputVal }, { merge: true });
-                        closeSalaryModal();
-                        showNotification("Cloud monthly balance target updated", "green");
-                    } catch (error) {
-                        console.error("Firestore settings saving error: ", error);
-                    }
-                }
-            }
-        };
-
-        // Export active ledger entries directly to CSV
         window.downloadCSV = () => {
             if (expenses.length === 0) {
                 showNotification("No transactions to export!", "pink");
@@ -1005,7 +1029,6 @@
             showNotification("Ledger exported successfully", "green");
         };
 
-        // Toast indicator triggers
         function showNotification(message, type = "green") {
             const toast = document.getElementById('toast-notification');
             const indicator = document.getElementById('toast-indicator');
@@ -1024,7 +1047,6 @@
             }, 4000);
         }
 
-        // Custom modal confirmation alerts
         function showConfirm(message, onOk) {
             const modal = document.getElementById('confirm-modal');
             const msgEl = document.getElementById('confirm-message');
